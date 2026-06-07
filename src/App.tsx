@@ -25,6 +25,7 @@ import { AdminPanel } from './pages/AdminPanel';
 import OAuth2Callback from './pages/OAuth2Callback';
 import { SellerRegister } from './pages/SellerRegister';
 import { SellerDashboard } from './pages/SellerDashboard';
+import { OrderTrackingPage } from './pages/OrderTrackingPage';
 
 // Query Client for React Query server state
 const queryClient = new QueryClient({
@@ -95,6 +96,7 @@ const App: React.FC = () => {
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/seller/register" element={<SellerRegister />} />
               <Route path="/seller/dashboard" element={<SellerDashboard />} />
+              <Route path="/orders/track/:orderId" element={<OrderTrackingPage />} />
               <Route path="/info/:pageKey" element={<PolicyInfo />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

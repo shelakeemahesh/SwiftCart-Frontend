@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Clock, Flame, ArrowRight, Store } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { apiClient } from '../api/apiClient';
-import { mapBackendProduct } from '../store/useSwiftStore';
+import { mapBackendProduct, useAuthStore } from '../store/useSwiftStore';
+import { ActiveOrderBanner } from '../components/ActiveOrderBanner';
 import type { Product } from '../data/mockDb';
 
 interface PromoBanner {
@@ -105,6 +106,24 @@ export const Home: React.FC = () => {
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [flashDeals, setFlashDeals] = useState<Product[]>([]);
 
+  const { isLoggedIn } = useAuthStore();
+  const [activeOrder, setActiveOrder] = useState<any | null>(null);
+
+  useEffect(() => {
+    const fetchActiveOrder = async () => {
+      if (!isLoggedIn) return;
+      try {
+        const data = await apiClient.get('/api/v1/orders/active');
+        if (data && typeof data === 'object' && data.orderId) {
+          setActiveOrder(data);
+        }
+      } catch (err) {
+        console.error("Failed to load active order banner", err);
+      }
+    };
+    fetchActiveOrder();
+  }, [isLoggedIn]);
+
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
@@ -128,6 +147,7 @@ export const Home: React.FC = () => {
 
   return (
     <div className="space-y-12 pb-16">
+      {activeOrder && <ActiveOrderBanner activeOrder={activeOrder} />}
       
       {/* 1. Hero Carousel */}
       <section 
