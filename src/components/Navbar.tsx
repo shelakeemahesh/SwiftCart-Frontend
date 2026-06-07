@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, User, MapPin, Heart, LogOut, ChevronDown, X } from 'lucide-react';
+import { Search, ShoppingCart, User, MapPin, Heart, LogOut, ChevronDown, X, Store } from 'lucide-react';
 import { useCartStore, useAuthStore, useToastStore, useWishlistStore, mapBackendProduct } from '../store/useSwiftStore';
 import { apiClient } from '../api/apiClient';
 import type { Product } from '../data/mockDb';
@@ -315,6 +315,16 @@ export const Navbar: React.FC = () => {
 
             {/* Right Cluster: Controls */}
             <div className="flex items-center gap-2 md:gap-4">
+              {/* Become a Seller CTA (Desktop) */}
+              {(!isLoggedIn || user?.role === 'CUSTOMER') && (
+                <Link
+                  to="/seller/register"
+                  className="hidden lg:flex items-center gap-1.5 text-sm font-semibold text-swift-dark hover:text-swift-blue transition-colors"
+                >
+                  <Store className="w-4 h-4" />
+                  <span>Become a Seller</span>
+                </Link>
+              )}
               {/* Search Toggle (Mobile Only) */}
               <button
                 onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
@@ -359,6 +369,24 @@ export const Navbar: React.FC = () => {
                         className="block px-4 py-2 text-sm text-swift-orange hover:bg-swift-bg font-extrabold transition-colors border-b border-gray-100"
                       >
                         Admin Panel
+                      </Link>
+                    )}
+                    {user?.role === 'SELLER' && (
+                      <Link
+                        to="/seller/dashboard"
+                        onClick={() => setShowAccountDropdown(false)}
+                        className="block px-4 py-2 text-sm text-swift-blue hover:bg-swift-bg font-extrabold transition-colors border-b border-gray-100"
+                      >
+                        🏪 Seller Dashboard
+                      </Link>
+                    )}
+                    {user?.role === 'CUSTOMER' && (
+                      <Link
+                        to="/seller/register"
+                        onClick={() => setShowAccountDropdown(false)}
+                        className="block px-4 py-2 text-sm text-swift-blue hover:bg-blue-50 font-semibold transition-colors border-b border-gray-100"
+                      >
+                        🚀 Become a Seller
                       </Link>
                     )}
                     <Link

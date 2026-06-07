@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Clock, Flame, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Flame, ArrowRight, Store } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { apiClient } from '../api/apiClient';
 import { mapBackendProduct } from '../store/useSwiftStore';
@@ -379,6 +379,40 @@ export const Home: React.FC = () => {
               <ProductCard product={product} />
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Become a Seller Banner */}
+      <section className="max-w-7xl mx-auto px-4 md:px-6 my-8">
+        <div className="bg-gradient-to-r from-swift-blue to-swift-blue-dark rounded-card p-8 md:p-12 text-white relative overflow-hidden shadow-card">
+          <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-15 pointer-events-none hidden md:block">
+            <Store className="w-full h-full text-white" />
+          </div>
+          <div className="relative z-10 max-w-2xl space-y-4">
+            <span className="bg-swift-orange text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+              SwiftCart Seller Hub
+            </span>
+            <h3 className="font-heading font-extrabold text-2xl md:text-3xl leading-tight">
+              Start your selling journey on SwiftCart
+            </h3>
+            <p className="text-sm md:text-base opacity-90">
+              Join thousands of merchants selling to millions of customers. Register in minutes with minimal documentation, low commissions, and 24/7 seller support.
+            </p>
+            <div className="flex flex-wrap gap-4 pt-2">
+              <Link
+                to="/seller/register"
+                className="bg-white text-swift-blue font-bold px-6 py-3 rounded-button text-sm hover:bg-gray-100 transition-colors shadow-md"
+              >
+                Register Now
+              </Link>
+              <button
+                onClick={() => navigate('/info/about')}
+                className="border border-white/40 hover:border-white text-white font-bold px-6 py-3 rounded-button text-sm transition-colors"
+              >
+                Learn More
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 

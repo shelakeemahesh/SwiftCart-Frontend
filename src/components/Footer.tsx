@@ -73,6 +73,7 @@ export const Footer: React.FC = () => {
                 <li><Link to="/info/cancellations" className="hover:text-swift-orange transition-colors">Cancellation Guidelines</Link></li>
                 <li><Link to="/info/shipping-delivery" className="hover:text-swift-orange transition-colors">Shipping & Delivery Speeds</Link></li>
                 <li><Link to="/info/faq-help" className="hover:text-swift-orange transition-colors">FAQ & Customer Service Help</Link></li>
+                <li className="pt-2 border-t border-gray-700"><Link to="/seller/register" className="hover:text-swift-blue transition-colors font-semibold text-gray-300">🚀 Sell on SwiftCart</Link></li>
               </ul>
             </div>
 

@@ -165,6 +165,19 @@ export const Login: React.FC = () => {
                 <span>Continue with Google</span>
               </button>
             </div>
+
+            <div className="text-center mt-6 pt-4 border-t border-gray-100">
+              <p className="text-xs text-swift-mid">
+                Want to sell on SwiftCart?{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate('/seller/register')}
+                  className="text-swift-blue font-bold hover:underline"
+                >
+                  Register as a Seller
+                </button>
+              </p>
+            </div>
           </div>
         ) : (
           // Enter OTP Code

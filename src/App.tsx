@@ -23,6 +23,8 @@ import { NotFound } from './pages/NotFound';
 import { PolicyInfo } from './pages/PolicyInfo';
 import { AdminPanel } from './pages/AdminPanel';
 import OAuth2Callback from './pages/OAuth2Callback';
+import { SellerRegister } from './pages/SellerRegister';
+import { SellerDashboard } from './pages/SellerDashboard';
 
 // Query Client for React Query server state
 const queryClient = new QueryClient({
@@ -91,6 +93,8 @@ const App: React.FC = () => {
               <Route path="/oauth2/callback" element={<OAuth2Callback />} />
               <Route path="/login/admin" element={<Navigate to="/login?redirect=admin" replace />} />
               <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/seller/register" element={<SellerRegister />} />
+              <Route path="/seller/dashboard" element={<SellerDashboard />} />
               <Route path="/info/:pageKey" element={<PolicyInfo />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
