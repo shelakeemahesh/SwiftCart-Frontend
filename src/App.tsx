@@ -7,6 +7,7 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { ToastContainer } from './components/ToastContainer';
+import { ChatWidget } from './components/chatbot/ChatWidget';
 
 // Page Components
 import { Home } from './pages/Home';
@@ -104,6 +105,7 @@ const App: React.FC = () => {
 
           {/* Page Footer */}
           <Footer />
+          <ChatWidget />
         </div>
       </Router>
     </QueryClientProvider>
