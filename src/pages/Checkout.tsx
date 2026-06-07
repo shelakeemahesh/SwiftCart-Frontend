@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Check, ShieldCheck, MapPin, Plus, FileText, ArrowRight, ArrowLeft, QrCode, Building, Wallet, Calendar } from 'lucide-react';
+import { CreditCard, Check, ShieldCheck, MapPin, Plus, FileText, ArrowRight, ArrowLeft, QrCode, Wallet, Calendar } from 'lucide-react';
 import { useCartStore, useAuthStore, useToastStore, mapBackendOrder } from '../store/useSwiftStore';
 import { mockDb } from '../data/mockDb';
 import { apiClient } from '../api/apiClient';
@@ -39,13 +39,13 @@ export const Checkout: React.FC = () => {
   const [addrType, setAddrType] = useState<'Home' | 'Work' | 'Other'>('Home');
 
   // Payment states
-  const [paymentTab, setPaymentTab] = useState<'card' | 'upi' | 'netbanking' | 'cod'>('card');
+  const [paymentTab, setPaymentTab] = useState<'card' | 'upi' | 'cod'>('card');
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
   const [cardName, setCardName] = useState('');
-  const [upiId, setUpiId] = useState('');
-  const [selectedBank, setSelectedBank] = useState('');
+  const [upiId, setUpiId] = useState('9503072201-4@ybl');
+
 
   // Generated Order Details for Confirmation Screen
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
@@ -128,11 +128,6 @@ export const Checkout: React.FC = () => {
         addToast('Please enter a valid UPI ID (e.g. mahesh@okaxis)', 'error');
         return;
       }
-    } else if (paymentTab === 'netbanking') {
-      if (!selectedBank) {
-        addToast('Please choose a bank for net banking', 'error');
-        return;
-      }
     }
 
     // Deliver Address details
@@ -152,7 +147,6 @@ export const Checkout: React.FC = () => {
     let backendPaymentMethod = 'COD';
     if (paymentTab === 'card') backendPaymentMethod = 'CARD';
     else if (paymentTab === 'upi') backendPaymentMethod = 'UPI';
-    else if (paymentTab === 'netbanking') backendPaymentMethod = 'NETBANKING';
 
     const placeOrderAsync = async () => {
       try {
@@ -508,7 +502,6 @@ export const Checkout: React.FC = () => {
                   {[
                     { id: 'card', label: 'Credit/Debit Card', icon: <CreditCard className="w-4 h-4" /> },
                     { id: 'upi', label: 'UPI / QR Scan', icon: <QrCode className="w-4 h-4" /> },
-                    { id: 'netbanking', label: 'Net Banking', icon: <Building className="w-4 h-4" /> },
                     { id: 'cod', label: 'Cash on Delivery', icon: <Wallet className="w-4 h-4" /> }
                   ].map((tab) => (
                     <button
@@ -596,10 +589,16 @@ export const Checkout: React.FC = () => {
                   {paymentTab === 'upi' && (
                     <form onSubmit={handlePaymentSubmit} className="space-y-4 text-center">
                       <div className="max-w-[200px] mx-auto border-2 border-gray-250 p-2.5 rounded-card bg-white shadow-xs">
-                        {/* Simulated QR Code */}
+                        {/* Dynamic UPI QR Code */}
                         <div className="bg-gray-50 aspect-square flex flex-col items-center justify-center p-2 rounded">
-                          <QrCode className="w-36 h-36 text-swift-dark" />
-                          <span className="text-[10px] font-mono text-swift-mid font-bold mt-1">SWIFTUPI@UPI</span>
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+                              `upi://pay?pa=9503072201-4@ybl&pn=SwiftCart&am=${totals.total + 10}&cu=INR`
+                            )}`}
+                            alt="UPI QR Scanner"
+                            className="w-36 h-36 object-contain"
+                          />
+                          <span className="text-[10px] font-mono text-swift-mid font-bold mt-1">9503072201-4@ybl</span>
                         </div>
                       </div>
                       <p className="text-[10px] text-swift-mid leading-relaxed">
@@ -627,34 +626,6 @@ export const Checkout: React.FC = () => {
                     </form>
                   )}
 
-                  {/* Netbanking dropdown selector */}
-                  {paymentTab === 'netbanking' && (
-                    <form onSubmit={handlePaymentSubmit} className="space-y-4 text-left">
-                      <div>
-                        <label className="block text-xs font-bold text-swift-dark mb-1.5">Choose your Bank</label>
-                        <select
-                          value={selectedBank}
-                          onChange={(e) => setSelectedBank(e.target.value)}
-                          className="w-full px-3 py-2.5 border border-gray-250 rounded-button text-sm focus:ring-0 focus:outline-none"
-                          required
-                        >
-                          <option value="">-- Choose Netbanking Option --</option>
-                          <option value="State Bank of India">State Bank of India</option>
-                          <option value="HDFC Bank">HDFC Bank</option>
-                          <option value="ICICI Bank">ICICI Bank</option>
-                          <option value="Axis Bank">Axis Bank</option>
-                          <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
-                        </select>
-                      </div>
-
-                      <button
-                        type="submit"
-                        className="w-full py-3.5 bg-swift-orange hover:bg-swift-orange-hover text-white rounded-button font-bold text-sm shadow-sm transition-all"
-                      >
-                        Redirect and Pay ₹{(totals.total + 10).toLocaleString('en-IN')}
-                      </button>
-                    </form>
-                  )}
 
                   {/* Cash on Delivery COD */}
                   {paymentTab === 'cod' && (
