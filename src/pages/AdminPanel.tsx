@@ -541,13 +541,25 @@ export const AdminPanel: React.FC = () => {
               ADMIN
             </button>
             <button 
-              onClick={() => { setRole('CUSTOMER'); navigate('/dashboard'); addToast('Role toggled to CUSTOMER. Panel exited.', 'warning'); }}
+              onClick={() => {
+                navigate('/dashboard');
+                setTimeout(() => {
+                  setRole('CUSTOMER');
+                  addToast('Role toggled to CUSTOMER. Panel exited.', 'warning');
+                }, 50);
+              }}
               className={`px-3 py-1 text-xs font-bold rounded-button transition-colors ${user?.role === 'CUSTOMER' ? 'bg-swift-orange text-white' : 'bg-white hover:bg-gray-100 text-swift-dark'}`}
             >
               CUSTOMER
             </button>
             <button 
-              onClick={() => { setRole('SELLER'); navigate('/dashboard'); addToast('Role toggled to SELLER. Panel exited.', 'warning'); }}
+              onClick={() => {
+                navigate('/seller/dashboard');
+                setTimeout(() => {
+                  setRole('SELLER');
+                  addToast('Role toggled to SELLER. Panel exited.', 'warning');
+                }, 50);
+              }}
               className={`px-3 py-1 text-xs font-bold rounded-button transition-colors ${user?.role === 'SELLER' ? 'bg-swift-orange text-white' : 'bg-white hover:bg-gray-100 text-swift-dark'}`}
             >
               SELLER
