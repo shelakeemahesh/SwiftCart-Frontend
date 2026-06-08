@@ -94,6 +94,7 @@ const App: React.FC = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/oauth2/callback" element={<OAuth2Callback />} />
               <Route path="/login/admin" element={<Navigate to="/login?redirect=admin" replace />} />
+              <Route path="/admin/login" element={<Navigate to="/login?redirect=admin" replace />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/seller/register" element={<SellerRegister />} />
               <Route path="/seller/dashboard" element={<SellerDashboard />} />

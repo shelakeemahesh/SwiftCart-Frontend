@@ -76,6 +76,29 @@ const emptyProductForm = {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
+// ─── Skeleton Loaders (module-scoped to avoid state loss on re-render) ──────
+const SkeletonCard: React.FC = () => (
+  <div className="bg-white border border-gray-100 rounded-card p-5 shadow-card animate-pulse">
+    <div className="h-3 bg-gray-200 rounded w-1/2 mb-3" />
+    <div className="h-8 bg-gray-200 rounded w-3/4 mb-2" />
+    <div className="h-2 bg-gray-100 rounded w-1/3" />
+  </div>
+);
+
+const SkeletonRow: React.FC = () => (
+  <tr className="animate-pulse">
+    <td className="py-3" colSpan={7}>
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 bg-gray-200 rounded" />
+        <div className="flex-1">
+          <div className="h-3 bg-gray-200 rounded w-1/3 mb-2" />
+          <div className="h-2 bg-gray-100 rounded w-1/4" />
+        </div>
+      </div>
+    </td>
+  </tr>
+);
+
 export const SellerDashboard: React.FC = () => {
   const { isLoggedIn, user } = useAuthStore();
   const { addToast } = useToastStore();
@@ -414,30 +437,6 @@ export const SellerDashboard: React.FC = () => {
 
   const getProductImage = (p: SellerProduct) =>
     p.images?.[0]?.imageUrl || FALLBACK_IMAGE;
-
-  // ─── Skeleton Loader ─────────────────────────────────────────────────────
-
-  const SkeletonCard = () => (
-    <div className="bg-white border border-gray-100 rounded-card p-5 shadow-card animate-pulse">
-      <div className="h-3 bg-gray-200 rounded w-1/2 mb-3" />
-      <div className="h-8 bg-gray-200 rounded w-3/4 mb-2" />
-      <div className="h-2 bg-gray-100 rounded w-1/3" />
-    </div>
-  );
-
-  const SkeletonRow = () => (
-    <tr className="animate-pulse">
-      <td className="py-3" colSpan={7}>
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-gray-200 rounded" />
-          <div className="flex-1">
-            <div className="h-3 bg-gray-200 rounded w-1/3 mb-2" />
-            <div className="h-2 bg-gray-100 rounded w-1/4" />
-          </div>
-        </div>
-      </td>
-    </tr>
-  );
 
   // ─── Sidebar Tabs ────────────────────────────────────────────────────────
 
