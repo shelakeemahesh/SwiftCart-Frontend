@@ -241,13 +241,30 @@ export const AdminPanel: React.FC = () => {
       return;
     }
 
-    // Load initial mock records
-    setMockUsers([
-      { id: 1, name: 'Mahesh Kumar', phone: '9876543210', email: 'mahesh@swiftcart.com', role: 'ADMIN', verified: true },
-      { id: 2, name: 'Amit Singh', phone: '9876543211', email: 'amit@swiftcart.com', role: 'SELLER', verified: true },
-      { id: 3, name: 'Rohan Shah', phone: '9876543212', email: 'rohan@swiftcart.com', role: 'CUSTOMER', verified: true },
-      { id: 4, name: 'Priya Patel', phone: '9876543213', email: 'priya@swiftcart.com', role: 'CUSTOMER', verified: false }
-    ]);
+    // Fetch real users from backend
+    const fetchRealUsers = async () => {
+      try {
+        const data = await apiClient.get('/api/v1/admin/users?page=0&size=100');
+        const usersList = data.content || data || [];
+        const normalized = usersList.map((u: any) => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone,
+          role: u.role,
+          verified: u.verified !== undefined ? u.verified : (u.isVerified !== undefined ? u.isVerified : true)
+        }));
+        setMockUsers(normalized);
+      } catch (err: any) {
+        setMockUsers([
+          { id: 1, name: 'Mahesh Kumar', phone: '9876543210', email: 'mahesh@swiftcart.com', role: 'ADMIN', verified: true },
+          { id: 2, name: 'Amit Singh', phone: '9876543211', email: 'amit@swiftcart.com', role: 'SELLER', verified: true },
+          { id: 3, name: 'Rohan Shah', phone: '9876543212', email: 'rohan@swiftcart.com', role: 'CUSTOMER', verified: true },
+          { id: 4, name: 'Priya Patel', phone: '9876543213', email: 'priya@swiftcart.com', role: 'CUSTOMER', verified: false }
+        ]);
+      }
+    };
+    fetchRealUsers();
     setMockProducts(mockDb.getProducts());
     setMockCoupons([
       { id: 1, code: 'SWIFT20', discountType: 'percentage', value: 20, minSpend: 999, description: '20% Off on minimum spend of ₹999', active: true },
@@ -371,15 +388,30 @@ export const AdminPanel: React.FC = () => {
   };
 
   // Mock changes
-  const handleToggleMockRole = (id: number, currentRole: string) => {
+  const handleToggleMockRole = async (id: number, currentRole: string) => {
     const nextRole = currentRole === 'ADMIN' ? 'CUSTOMER' : currentRole === 'CUSTOMER' ? 'SELLER' : 'ADMIN';
-    setMockUsers(prev => prev.map(u => u.id === id ? { ...u, role: nextRole } : u));
-    addToast(`[MOCK] Updated User role to ${nextRole}`, 'success');
+    try {
+      await apiClient.put(`/api/v1/admin/users/${id}/role?role=${nextRole}`);
+      setMockUsers(prev => prev.map(u => u.id === id ? { ...u, role: nextRole } : u));
+      addToast(`Updated user role to ${nextRole} in database`, 'success');
+    } catch (err: any) {
+      setMockUsers(prev => prev.map(u => u.id === id ? { ...u, role: nextRole } : u));
+      addToast(`[MOCK] Updated User role to ${nextRole}`, 'success');
+    }
   };
 
-  const handleToggleMockVerify = (id: number) => {
-    setMockUsers(prev => prev.map(u => u.id === id ? { ...u, verified: !u.verified } : u));
-    addToast('[MOCK] Toggled user verification status', 'success');
+  const handleToggleMockVerify = async (id: number) => {
+    const targetUser = mockUsers.find(u => u.id === id);
+    if (!targetUser) return;
+    const nextVerifiedState = !targetUser.verified;
+    try {
+      await apiClient.put(`/api/v1/admin/users/${id}/verify?verified=${nextVerifiedState}`);
+      setMockUsers(prev => prev.map(u => u.id === id ? { ...u, verified: nextVerifiedState } : u));
+      addToast(`User ${nextVerifiedState ? 'activated' : 'deactivated'} in database`, 'success');
+    } catch (err: any) {
+      setMockUsers(prev => prev.map(u => u.id === id ? { ...u, verified: nextVerifiedState } : u));
+      addToast('[MOCK] Toggled user verification status', 'success');
+    }
   };
 
   const handleApproveProductMock = (id: string, approve: boolean) => {

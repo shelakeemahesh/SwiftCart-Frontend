@@ -21,8 +21,13 @@ export const Checkout: React.FC = () => {
     if (!isLoggedIn) {
       addToast('Please login to continue checkout', 'warning');
       navigate('/login?redirect=checkout');
+      return;
     }
-  }, [isLoggedIn, navigate]);
+    if (user?.role === 'SELLER') {
+      addToast('Sellers are not permitted to checkout products.', 'error');
+      navigate('/seller/dashboard');
+    }
+  }, [isLoggedIn, user, navigate]);
 
   // Steps: 1 (Address), 2 (Review), 3 (Payment), 4 (Confirmation)
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);

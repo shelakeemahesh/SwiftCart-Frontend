@@ -106,7 +106,7 @@ export const SellerDashboard: React.FC = () => {
 
   // Auth guard
   useEffect(() => {
-    if (!isLoggedIn || user?.role !== 'SELLER') {
+    if (!isLoggedIn || (user?.role !== 'SELLER' && user?.role !== 'ADMIN')) {
       navigate('/login');
     }
   }, [isLoggedIn, user?.role, navigate]);
@@ -449,7 +449,7 @@ export const SellerDashboard: React.FC = () => {
 
   // ─── Render ──────────────────────────────────────────────────────────────
 
-  if (!isLoggedIn || user?.role !== 'SELLER') return null;
+  if (!isLoggedIn || (user?.role !== 'SELLER' && user?.role !== 'ADMIN')) return null;
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8 pb-24 text-left">

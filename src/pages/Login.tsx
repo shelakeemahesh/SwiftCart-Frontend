@@ -9,7 +9,7 @@ export const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect') || 'dashboard';
 
-  const { loginWithAuthData, isLoggedIn } = useAuthStore();
+  const { loginWithAuthData, isLoggedIn, user } = useAuthStore();
   const { addToast } = useToastStore();
 
   const [phone, setPhone] = useState('');
@@ -19,10 +19,16 @@ export const Login: React.FC = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (isLoggedIn) {
-      navigate(`/${redirect}`);
+    if (isLoggedIn && user) {
+      if (user.role === 'ADMIN') {
+        navigate('/admin');
+      } else if (user.role === 'SELLER') {
+        navigate('/seller/dashboard');
+      } else {
+        navigate(redirect === 'admin' || redirect === 'seller/dashboard' ? '/dashboard' : `/${redirect}`);
+      }
     }
-  }, [isLoggedIn, redirect, navigate]);
+  }, [isLoggedIn, user, redirect, navigate]);
 
   // Resend Timer logic
   useEffect(() => {
@@ -76,7 +82,14 @@ export const Login: React.FC = () => {
       });
       loginWithAuthData(authData);
       addToast('Log in successful! Welcome to SwiftCart.', 'success');
-      navigate(`/${redirect}`);
+      
+      if (authData.role === 'ADMIN') {
+        navigate('/admin');
+      } else if (authData.role === 'SELLER') {
+        navigate('/seller/dashboard');
+      } else {
+        navigate(redirect === 'admin' || redirect === 'seller/dashboard' ? '/dashboard' : `/${redirect}`);
+      }
     } catch (err: any) {
       addToast(err.message || 'Invalid verification code. Please verify and retry.', 'error');
     }

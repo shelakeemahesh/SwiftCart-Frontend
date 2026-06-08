@@ -46,6 +46,10 @@ export const Dashboard: React.FC = () => {
       navigate('/login?redirect=dashboard');
       return;
     }
+    if (user?.role === 'SELLER') {
+      navigate('/seller/dashboard');
+      return;
+    }
     const fetchOrders = async () => {
       try {
         const response = await apiClient.get('/api/v1/orders');
@@ -56,7 +60,7 @@ export const Dashboard: React.FC = () => {
       }
     };
     fetchOrders();
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, user, navigate]);
 
   // Filter orders
   const filteredOrders = orders.filter((o) => {
