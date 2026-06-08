@@ -196,7 +196,8 @@ export const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'products' | 'coupons' | 'flash' | 'csv' | 'testing'>('analytics');
 
   // --- API Testing Deck State ---
-  const [selectedPreset, setSelectedPreset] = useState<ApiPreset>(API_PRESETS[0]);
+  const [selectedPresetName, setSelectedPresetName] = useState(API_PRESETS[0].name);
+  const selectedPreset = API_PRESETS.find(p => p.name === selectedPresetName) || API_PRESETS[0];
   const [apiUrl, setApiUrl] = useState('http://localhost:8080');
   const [apiPath, setApiPath] = useState(API_PRESETS[0].path);
   const [apiMethod, setApiMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE'>(API_PRESETS[0].method);
@@ -273,15 +274,6 @@ export const AdminPanel: React.FC = () => {
     ]);
     setMockFlashSales([]);
   }, [isLoggedIn, user, navigate, addToast]);
-
-  // Sync API path/parameters when preset changes
-  useEffect(() => {
-    setApiPath(selectedPreset.path);
-    setApiMethod(selectedPreset.method);
-    setRequestBody(selectedPreset.defaultBody || '');
-    setQueryParams(selectedPreset.defaultParams || []);
-    setUploadedFile(null);
-  }, [selectedPreset]);
 
   // Save JWT changes to localStorage
   const handleSaveJwt = (token: string) => {
@@ -1226,10 +1218,17 @@ export const AdminPanel: React.FC = () => {
                   <div className="md:col-span-3">
                     <label className="block text-[10px] font-bold text-swift-dark uppercase mb-1">Select Endpoint Template</label>
                     <select
-                      value={selectedPreset.name}
+                      value={selectedPresetName}
                       onChange={e => {
                         const pr = API_PRESETS.find(p => p.name === e.target.value);
-                        if (pr) setSelectedPreset(pr);
+                        if (pr) {
+                          setSelectedPresetName(pr.name);
+                          setApiPath(pr.path);
+                          setApiMethod(pr.method);
+                          setRequestBody(pr.defaultBody || '');
+                          setQueryParams(pr.defaultParams || []);
+                          setUploadedFile(null);
+                        }
                       }}
                       className="w-full px-3 py-2 border border-gray-250 rounded-button text-xs font-bold focus:border-swift-orange"
                     >

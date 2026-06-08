@@ -23,7 +23,7 @@ export const CartDrawer: React.FC = () => {
     };
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, [isCartOpen]);
+  }, [isCartOpen, setCartOpen]);
 
   // Disable body scroll when drawer is open
   useEffect(() => {

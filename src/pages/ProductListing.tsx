@@ -30,19 +30,6 @@ export const ProductListing: React.FC = () => {
   // Pagination
   const [visibleCount, setVisibleCount] = useState(8);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  // Reset filters on category changes
-  useEffect(() => {
-    setSelectedBrands([]);
-    setMinPrice(0);
-    setMaxPrice(80000);
-    setSelectedRating(null);
-    setSelectedDiscounts([]);
-    setInStockOnly(false);
-    setSelectedSellers([]);
-    setVisibleCount(8);
-  }, [categoryName]);
-
   const [products, setProducts] = useState<Product[]>([]);
   const [allCatProducts, setAllCatProducts] = useState<Product[]>([]);
 

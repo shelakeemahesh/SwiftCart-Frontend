@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Store, User, MapPin, Shield, ChevronRight, ChevronLeft, Check,
@@ -6,6 +6,18 @@ import {
 } from 'lucide-react';
 import { apiClient } from '../api/apiClient';
 import { useAuthStore, useToastStore } from '../store/useSwiftStore';
+
+const CONFETTI_PARTICLES = Array.from({ length: 40 }).map((_, i) => ({
+  left: `${(i * 7.7 + 3) % 100}%`,
+  top: `-${(i * 13 + 5) % 20 + 5}%`,
+  width: `${(i * 3 + 6) % 10 + 6}px`,
+  height: `${(i * 3 + 6) % 10 + 6}px`,
+  backgroundColor: ['#EF9F27', '#185FA5', '#3B6D11', '#A32D2D', '#2C2C2A'][i % 5],
+  borderRadius: i % 2 === 0 ? '50%' : '2px',
+  animationDelay: `${(i * 0.15) % 1.5}s`,
+  animationDuration: `${((i * 0.25) % 3) + 2}s`,
+  rotate: `${(i * 45) % 360}deg`,
+}));
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -105,7 +117,7 @@ export const SellerRegister: React.FC = () => {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [touched, setTouched] = useState<Set<string>>(new Set());
+  const touchedRef = useRef<Set<string>>(new Set());
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -146,7 +158,7 @@ export const SellerRegister: React.FC = () => {
       setForm((prev) => ({ ...prev, [field]: value }));
 
       // Clear error on change if field is touched
-      if (touched.has(field)) {
+      if (touchedRef.current.has(field)) {
         setErrors((prev) => {
           const next = { ...prev };
           delete next[field];
@@ -154,12 +166,12 @@ export const SellerRegister: React.FC = () => {
         });
       }
     },
-    [touched],
+    [],
   );
 
   const handleBlur = useCallback(
     (field: keyof FormData) => () => {
-      setTouched((prev) => new Set(prev).add(field));
+      touchedRef.current.add(field);
       const stepErrors = validateStep(step, form);
       if (stepErrors[field]) {
         setErrors((prev) => ({ ...prev, [field]: stepErrors[field] }));
@@ -186,11 +198,7 @@ export const SellerRegister: React.FC = () => {
         ['pickupAddress', 'pickupPincode', 'bankAccountNumber', 'ifscCode'],
       ];
       const fields = fieldsPerStep[step] || [];
-      setTouched((prev) => {
-        const next = new Set(prev);
-        fields.forEach((f) => next.add(f));
-        return next;
-      });
+      fields.forEach((f) => touchedRef.current.add(f));
       return;
     }
     setSlideDir('left');
@@ -298,19 +306,19 @@ export const SellerRegister: React.FC = () => {
       <div className="min-h-screen bg-swift-bg flex items-center justify-center p-4">
         {/* Confetti particles */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
-          {Array.from({ length: 40 }).map((_, i) => (
+          {CONFETTI_PARTICLES.map((p, i) => (
             <div
               key={i}
               className="absolute animate-bounce"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `-${Math.random() * 20 + 5}%`,
-                width: `${Math.random() * 10 + 6}px`,
-                height: `${Math.random() * 10 + 6}px`,
-                backgroundColor: ['#EF9F27', '#185FA5', '#3B6D11', '#A32D2D', '#2C2C2A'][Math.floor(Math.random() * 5)],
-                borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-                animation: `confettiFall ${Math.random() * 3 + 2}s ease-in-out ${Math.random() * 1}s forwards`,
-                transform: `rotate(${Math.random() * 360}deg)`,
+                left: p.left,
+                top: p.top,
+                width: p.width,
+                height: p.height,
+                backgroundColor: p.backgroundColor,
+                borderRadius: p.borderRadius,
+                animation: `confettiFall ${p.animationDuration} ease-in-out ${p.animationDelay} forwards`,
+                transform: `rotate(${p.rotate})`,
               }}
             />
           ))}
@@ -401,7 +409,7 @@ export const SellerRegister: React.FC = () => {
 
         {/* Footer */}
         <p className="relative z-10 text-[10px] text-blue-300/60 mt-8">
-          © {new Date().getFullYear()} SwiftCart Marketplace Pvt. Ltd. All rights reserved.
+          © 2026 SwiftCart Marketplace Pvt. Ltd. All rights reserved.
         </p>
       </div>
 

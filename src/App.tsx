@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Global Components
@@ -61,6 +61,11 @@ const SkipToContent: React.FC = () => {
   );
 };
 
+const ProductListingRoute = () => {
+  const { categoryName } = useParams<{ categoryName: string }>();
+  return <ProductListing key={categoryName} />;
+};
+
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -68,22 +73,22 @@ const App: React.FC = () => {
         <div className="flex flex-col min-h-screen bg-swift-bg text-swift-dark font-sans selection:bg-swift-orange/30">
           {/* Skip link for accessibility */}
           <SkipToContent />
-
+ 
           {/* Sticky Navbar */}
           <Navbar />
-
+ 
           {/* Floating Cart Drawer overlay */}
           <CartDrawer />
-
+ 
           {/* Toast Notification channel */}
           <ToastContainer />
-
+ 
           {/* Main Layout Area */}
           <main id="main-content" className="flex-grow">
             <ScrollToTop />
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/category/:categoryName" element={<ProductListing />} />
+              <Route path="/category/:categoryName" element={<ProductListingRoute />} />
               <Route path="/product/:slug" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />

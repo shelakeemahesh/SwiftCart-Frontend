@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Check, Package, MapPin, Calendar, Clock, AlertTriangle } from 'lucide-react';
@@ -29,6 +29,49 @@ interface OrderTrackingData {
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200';
 
+const getStepLabel = (step: string) => {
+  switch (step) {
+    case 'PLACED': return 'Order Placed';
+    case 'CONFIRMED': return 'Order Confirmed';
+    case 'SHIPPED': return 'Shipped';
+    case 'OUT_FOR_DELIVERY': return 'Out For Delivery';
+    case 'DELIVERED': return 'Delivered';
+    default: return step.replace(/_/g, ' ');
+  }
+};
+
+const getStepDescription = (step: string) => {
+  switch (step) {
+    case 'PLACED': return 'Your order has been successfully logged on our system.';
+    case 'CONFIRMED': return 'Seller has approved your order and is packaging the goods.';
+    case 'SHIPPED': return 'Your package has been handed over to our courier partner.';
+    case 'OUT_FOR_DELIVERY': return 'A delivery executive is bringing the package to your location.';
+    case 'DELIVERED': return 'Package received. Thank you for choosing SwiftCart!';
+    default: return '';
+  }
+};
+
+const formatStepTimestamp = (timestampStr: string | null) => {
+  if (!timestampStr) return null;
+  const date = new Date(timestampStr);
+  return date.toLocaleString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const formatEstDelivery = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-IN', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+};
+
 export const OrderTrackingPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
@@ -46,7 +89,7 @@ export const OrderTrackingPage: React.FC = () => {
     }
   }, [isLoggedIn, navigate, orderId]);
 
-  const fetchTracking = async () => {
+  const fetchTracking = useCallback(async () => {
     try {
       setLoading(true);
       const data = await apiClient.get(`/api/v1/orders/${orderId}/track`);
@@ -58,59 +101,15 @@ export const OrderTrackingPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId, addToast]);
 
   useEffect(() => {
     if (isLoggedIn && orderId) {
       fetchTracking();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn, orderId]);
+  }, [isLoggedIn, orderId, fetchTracking]);
 
   if (!isLoggedIn) return null;
-
-  const getStepLabel = (step: string) => {
-    switch (step) {
-      case 'PLACED': return 'Order Placed';
-      case 'CONFIRMED': return 'Order Confirmed';
-      case 'SHIPPED': return 'Shipped';
-      case 'OUT_FOR_DELIVERY': return 'Out For Delivery';
-      case 'DELIVERED': return 'Delivered';
-      default: return step.replace(/_/g, ' ');
-    }
-  };
-
-  const getStepDescription = (step: string) => {
-    switch (step) {
-      case 'PLACED': return 'Your order has been successfully logged on our system.';
-      case 'CONFIRMED': return 'Seller has approved your order and is packaging the goods.';
-      case 'SHIPPED': return 'Your package has been handed over to our courier partner.';
-      case 'OUT_FOR_DELIVERY': return 'A delivery executive is bringing the package to your location.';
-      case 'DELIVERED': return 'Package received. Thank you for choosing SwiftCart!';
-      default: return '';
-    }
-  };
-
-  const formatStepTimestamp = (timestampStr: string | null) => {
-    if (!timestampStr) return null;
-    const date = new Date(timestampStr);
-    return date.toLocaleString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatEstDelivery = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-IN', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
 
   // Motion variants for container and items
   const containerVariants = {

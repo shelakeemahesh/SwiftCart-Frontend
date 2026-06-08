@@ -6,6 +6,8 @@ import { apiClient } from '../api/apiClient';
 import type { Product } from '../data/mockDb';
 import { FALLBACK_IMAGE } from './ProductCard';
 
+const CATEGORIES = ['Electronics', 'Fashion', 'Home', 'Grocery', 'Beauty', 'Sports', 'Toys', 'Books'];
+
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,7 +37,7 @@ export const Navbar: React.FC = () => {
   const accountRef = useRef<HTMLDivElement>(null);
 
   // Active category navigation helper
-  const categories = ['Electronics', 'Fashion', 'Home', 'Grocery', 'Beauty', 'Sports', 'Toys', 'Books'];
+  const categories = CATEGORIES;
 
   // Debounced search logic (300ms)
   useEffect(() => {

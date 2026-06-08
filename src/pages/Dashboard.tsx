@@ -10,19 +10,12 @@ import { apiClient } from '../api/apiClient';
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const activeTabParam = searchParams.get('tab') || 'orders';
+  const activeTab = searchParams.get('tab') || 'orders';
 
   const { isLoggedIn, user, logout, addresses, addAddress, removeAddress, setDefaultAddress } = useAuthStore();
   const { wishlist } = useWishlistStore();
   const { addToCart } = useCartStore();
   const { addToast } = useToastStore();
-
-  const [activeTab, setActiveTab] = useState<string>(activeTabParam);
-  
-  // Track active tab parameter sync
-  useEffect(() => {
-    setActiveTab(activeTabParam);
-  }, [activeTabParam]);
 
   // Orders state
   const [orders, setOrders] = useState<Order[]>([]);

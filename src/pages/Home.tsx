@@ -16,55 +16,57 @@ interface PromoBanner {
   bgColor: string;
 }
 
+// Banners list
+const BANNERS: PromoBanner[] = [
+  {
+    id: 1,
+    image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1000&auto=format&fit=crop&q=80',
+    title: 'Electronics Extravaganza',
+    subtitle: 'Up to 60% OFF on Audio, Laptops, & Smart Wearables',
+    category: 'Electronics',
+    bgColor: 'from-[#185FA5] to-[#0C447C]'
+  },
+  {
+    id: 2,
+    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&auto=format&fit=crop&q=80',
+    title: 'Summer Fashion Fiesta',
+    subtitle: 'Flat 50% OFF on Streetwear & Athletic Shoes',
+    category: 'Fashion',
+    bgColor: 'from-[#D85A30] to-[#EF9F27]'
+  },
+  {
+    id: 3,
+    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1000&auto=format&fit=crop&q=80',
+    title: 'Home Zen Makeover',
+    subtitle: 'Premium Furniture & Kitchen blenders at lowest price',
+    category: 'Home',
+    bgColor: 'from-teal-700 to-emerald-800'
+  }
+];
+
+const CATEGORIES = [
+  { name: 'Electronics', icon: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Fashion', icon: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Home', icon: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Grocery', icon: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Beauty', icon: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Sports', icon: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Toys', icon: 'https://images.unsplash.com/photo-1537655780520-1e392edd816a?w=150&auto=format&fit=crop&q=80' },
+  { name: 'Books', icon: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=150&auto=format&fit=crop&q=80' }
+];
+
+const BRANDS = [
+  { name: 'SwiftAudio', logo: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=80&auto=format&fit=crop&q=80' },
+  { name: 'AeroRun', logo: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=80&auto=format&fit=crop&q=80' },
+  { name: 'SmartVibe', logo: 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=80&auto=format&fit=crop&q=80' },
+  { name: 'HomeZen', logo: 'https://images.unsplash.com/photo-1505797149-43b0069ec26b?w=80&auto=format&fit=crop&q=80' },
+  { name: 'OpalGlow', logo: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=80&auto=format&fit=crop&q=80' }
+];
+
 export const Home: React.FC = () => {
   const navigate = useNavigate();
-
-  // Banners list
-  const BANNERS: PromoBanner[] = [
-    {
-      id: 1,
-      image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1000&auto=format&fit=crop&q=80',
-      title: 'Electronics Extravaganza',
-      subtitle: 'Up to 60% OFF on Audio, Laptops, & Smart Wearables',
-      category: 'Electronics',
-      bgColor: 'from-[#185FA5] to-[#0C447C]'
-    },
-    {
-      id: 2,
-      image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&auto=format&fit=crop&q=80',
-      title: 'Summer Fashion Fiesta',
-      subtitle: 'Flat 50% OFF on Streetwear & Athletic Shoes',
-      category: 'Fashion',
-      bgColor: 'from-[#D85A30] to-[#EF9F27]'
-    },
-    {
-      id: 3,
-      image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1000&auto=format&fit=crop&q=80',
-      title: 'Home Zen Makeover',
-      subtitle: 'Premium Furniture & Kitchen blenders at lowest price',
-      category: 'Home',
-      bgColor: 'from-teal-700 to-emerald-800'
-    }
-  ];
-
-  const categories = [
-    { name: 'Electronics', icon: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Fashion', icon: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Home', icon: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Grocery', icon: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Beauty', icon: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Sports', icon: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Toys', icon: 'https://images.unsplash.com/photo-1537655780520-1e392edd816a?w=150&auto=format&fit=crop&q=80' },
-    { name: 'Books', icon: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=150&auto=format&fit=crop&q=80' }
-  ];
-
-  const brands = [
-    { name: 'SwiftAudio', logo: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=80&auto=format&fit=crop&q=80' },
-    { name: 'AeroRun', logo: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=80&auto=format&fit=crop&q=80' },
-    { name: 'SmartVibe', logo: 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=80&auto=format&fit=crop&q=80' },
-    { name: 'HomeZen', logo: 'https://images.unsplash.com/photo-1505797149-43b0069ec26b?w=80&auto=format&fit=crop&q=80' },
-    { name: 'OpalGlow', logo: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=80&auto=format&fit=crop&q=80' }
-  ];
+  const categories = CATEGORIES;
+  const brands = BRANDS;
 
   // Carousel logic
   const [currentSlide, setCurrentSlide] = useState(0);

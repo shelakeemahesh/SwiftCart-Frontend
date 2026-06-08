@@ -27,7 +27,7 @@ export const Checkout: React.FC = () => {
       addToast('Sellers are not permitted to checkout products.', 'error');
       navigate('/seller/dashboard');
     }
-  }, [isLoggedIn, user, navigate]);
+  }, [isLoggedIn, user, navigate, addToast]);
 
   // Steps: 1 (Address), 2 (Review), 3 (Payment), 4 (Confirmation)
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -55,13 +55,6 @@ export const Checkout: React.FC = () => {
   // Generated Order Details for Confirmation Screen
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
 
-  // Autofill city/state if pincode is entered (simulated)
-  useEffect(() => {
-    if (addrPincode.length === 6) {
-      setAddrCity('Bengaluru');
-      setAddrState('Karnataka');
-    }
-  }, [addrPincode]);
 
   const handleAddAddressSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -281,7 +274,14 @@ export const Checkout: React.FC = () => {
                         type="text"
                         maxLength={6}
                         value={addrPincode}
-                        onChange={(e) => setAddrPincode(e.target.value.replace(/\D/g, ''))}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          setAddrPincode(val);
+                          if (val.length === 6) {
+                            setAddrCity('Bengaluru');
+                            setAddrState('Karnataka');
+                          }
+                        }}
                         placeholder="e.g. 560103"
                         className="w-full px-3 py-2 border border-gray-200 rounded-button text-sm focus:border-swift-orange"
                         required

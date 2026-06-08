@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Package, ShoppingCart, TrendingUp, AlertTriangle, Plus, Edit2, Trash2,
@@ -158,7 +158,7 @@ export const SellerDashboard: React.FC = () => {
 
   // ─── Data Fetching ───────────────────────────────────────────────────────
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setLoadingStats(true);
     try {
       const data = await apiClient.get('/api/v1/seller/dashboard');
@@ -191,9 +191,9 @@ export const SellerDashboard: React.FC = () => {
     } finally {
       setLoadingStats(false);
     }
-  };
+  }, [addToast]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoadingProducts(true);
     try {
       const data = await apiClient.get('/api/v1/seller/products');
@@ -204,9 +204,9 @@ export const SellerDashboard: React.FC = () => {
     } finally {
       setLoadingProducts(false);
     }
-  };
+  }, [addToast]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoadingOrders(true);
     try {
       const data = await apiClient.get('/api/v1/seller/orders');
@@ -217,9 +217,9 @@ export const SellerDashboard: React.FC = () => {
     } finally {
       setLoadingOrders(false);
     }
-  };
+  }, [addToast]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const data = await apiClient.get('/api/v1/categories');
       const list = Array.isArray(data) ? data : data.content ?? [];
@@ -232,7 +232,7 @@ export const SellerDashboard: React.FC = () => {
         { id: 5, name: 'Books' }, { id: 6, name: 'Beauty' },
       ]);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn && user?.role === 'SELLER') {
@@ -241,8 +241,7 @@ export const SellerDashboard: React.FC = () => {
       fetchOrders();
       fetchCategories();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn, user?.role]);
+  }, [isLoggedIn, user?.role, fetchStats, fetchProducts, fetchOrders, fetchCategories]);
 
   // ─── Handlers: Products ──────────────────────────────────────────────────
 
@@ -389,19 +388,26 @@ export const SellerDashboard: React.FC = () => {
       return;
     }
     setBulkUpdating(true);
-    let successCount = 0;
-    for (const [id, qty] of entries) {
-      try {
-        await apiClient.put(`/api/v1/seller/products/${id}/stock?qty=${Number(qty)}`);
-        successCount++;
-      } catch {
-        // continue with remaining
-      }
+    
+    try {
+      const updatePromises = entries.map(async ([id, qty]) => {
+        try {
+          await apiClient.put(`/api/v1/seller/products/${id}/stock?qty=${Number(qty)}`);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      const results = await Promise.all(updatePromises);
+      const successCount = results.filter(Boolean).length;
+      addToast(`Updated stock for ${successCount} product(s)`, 'success');
+    } catch (err: any) {
+      addToast('An error occurred during bulk stock update', 'error');
+    } finally {
+      setBulkStockUpdates({});
+      setBulkUpdating(false);
+      await fetchProducts();
     }
-    addToast(`Updated stock for ${successCount} product(s)`, 'success');
-    setBulkStockUpdates({});
-    setBulkUpdating(false);
-    await fetchProducts();
   };
 
   // ─── Filtered Products for Search ────────────────────────────────────────

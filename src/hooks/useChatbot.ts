@@ -59,10 +59,8 @@ export const useChatbot = () => {
 
   // Reset or initialize chatbot history when login state changes or when empty
   useEffect(() => {
-    if (messages.length === 0) {
-      initializeChat();
-    }
-  }, [isLoggedIn, messages.length, initializeChat]);
+    initializeChat();
+  }, [isLoggedIn, initializeChat]);
 
   const toggleChat = useCallback(() => {
     setIsOpen(prev => !prev);
