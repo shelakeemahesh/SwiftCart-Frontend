@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { apiClient } from '../api/apiClient';
+import { apiClient, API_BASE_URL } from '../api/apiClient';
 import { mockDb } from '../data/mockDb';
 import type { Product, Coupon, Address, Order } from '../data/mockDb';
 
@@ -249,7 +249,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const refreshToken = localStorage.getItem('sc_refresh_token');
       if (refreshToken) {
-        await fetch('http://localhost:8080/api/v1/auth/logout', {
+        await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken })

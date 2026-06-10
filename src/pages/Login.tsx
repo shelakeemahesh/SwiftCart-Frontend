@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ShieldCheck, RefreshCw } from 'lucide-react';
 import { useAuthStore, useToastStore } from '../store/useSwiftStore';
-import { apiClient } from '../api/apiClient';
+import { apiClient, API_BASE_URL } from '../api/apiClient';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -107,7 +107,7 @@ export const Login: React.FC = () => {
   };
 
   const handleSocialLogin = (provider: 'google') => {
-    const backendUrl = `http://localhost:8080/oauth2/authorize/${provider}`;
+    const backendUrl = `${API_BASE_URL}/oauth2/authorize/${provider}`;
     const redirectUri = `http://localhost:5173/oauth2/callback`;
     window.location.href = `${backendUrl}?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };

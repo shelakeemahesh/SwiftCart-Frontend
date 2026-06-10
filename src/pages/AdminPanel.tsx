@@ -21,7 +21,7 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import { useAuthStore, useToastStore } from '../store/useSwiftStore';
-import { apiClient } from '../api/apiClient';
+import { apiClient, API_BASE_URL } from '../api/apiClient';
 import { mockDb } from '../data/mockDb';
 import type { Product } from '../data/mockDb';
 import { FALLBACK_IMAGE } from '../components/ProductCard';
@@ -198,7 +198,7 @@ export const AdminPanel: React.FC = () => {
   // --- API Testing Deck State ---
   const [selectedPresetName, setSelectedPresetName] = useState(API_PRESETS[0].name);
   const selectedPreset = API_PRESETS.find(p => p.name === selectedPresetName) || API_PRESETS[0];
-  const [apiUrl, setApiUrl] = useState('http://localhost:8080');
+  const [apiUrl, setApiUrl] = useState(API_BASE_URL);
   const [apiPath, setApiPath] = useState(API_PRESETS[0].path);
   const [apiMethod, setApiMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE'>(API_PRESETS[0].method);
   const [jwtToken, setJwtToken] = useState(localStorage.getItem('sc_jwt_token') || '');

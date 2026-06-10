@@ -5,7 +5,7 @@ import { useAuthStore, useWishlistStore, useCartStore, useToastStore, mapBackend
 import type { Order, Address } from '../data/mockDb';
 import { mockDb } from '../data/mockDb';
 import { ProductCard, FALLBACK_IMAGE } from '../components/ProductCard';
-import { apiClient } from '../api/apiClient';
+import { apiClient, API_BASE_URL } from '../api/apiClient';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ export const Dashboard: React.FC = () => {
 
   const handleInvoiceDownload = async (orderId: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/orders/${orderId}/invoice`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/orders/${orderId}/invoice`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('sc_access_token')}`
         }
