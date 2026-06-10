@@ -120,6 +120,9 @@ export function mapBackendOrder(o: any): Order {
 }
 
 
+// Keep track of the last shown timestamp for each toast message to prevent spamming
+const lastToastTimes = new Map<string, number>();
+
 // Toast Types and Store
 export interface Toast {
   id: string;
@@ -136,6 +139,16 @@ interface ToastStore {
 export const useToastStore = create<ToastStore>((set) => ({
   toasts: [],
   addToast: (message, type = 'info') => {
+    const key = `${type}:${message}`;
+    const now = Date.now();
+    const lastTime = lastToastTimes.get(key) || 0;
+    
+    // Cooldown of 1.5s (1500ms) to prevent showing duplicate toasts rapidly
+    if (now - lastTime < 1500) {
+      return;
+    }
+    lastToastTimes.set(key, now);
+
     const id = Math.random().toString(36).substring(7);
     set((state) => ({
       toasts: [...state.toasts, { id, type, message }]

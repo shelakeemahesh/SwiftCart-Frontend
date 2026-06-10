@@ -1,28 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronUp, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
 
   return (
     <>
@@ -147,16 +127,6 @@ export const Footer: React.FC = () => {
         </div>
       </footer>
 
-      {/* Floating Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-40 bg-swift-orange hover:bg-swift-orange-hover text-white p-3 rounded-full shadow-modal transition-all duration-300 hover:scale-105"
-          aria-label="Back to Top"
-        >
-          <ChevronUp className="w-6 h-6" strokeWidth={2.5} />
-        </button>
-      )}
     </>
   );
 };

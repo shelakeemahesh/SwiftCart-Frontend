@@ -8,7 +8,7 @@ export const ChatWidget: React.FC = () => {
   const { isOpen, messages, isTyping, toggleChat, sendMessage, resetChat } = useChatbot();
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
+    <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-4 sm:right-6 z-50 flex flex-col items-end gap-4 max-w-full">
       <AnimatePresence>
         {isOpen && (
           <motion.div

@@ -40,7 +40,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const quickReplyOptions = lastMessage && lastMessage.sender === 'bot' ? lastMessage.options : [];
 
   return (
-    <div className="w-[360px] h-[520px] bg-white rounded-2xl shadow-modal border border-gray-100 flex flex-col overflow-hidden z-50">
+    <div className="w-[calc(100vw-2rem)] sm:w-[360px] h-[80vh] sm:h-[520px] max-h-[520px] bg-white rounded-2xl shadow-modal border border-gray-100 flex flex-col overflow-hidden z-50">
       {/* Premium Gradient Header */}
       <div className="bg-gradient-to-r from-swift-blue to-swift-blue-dark text-white px-4 py-3 flex items-center justify-between shadow-sm flex-shrink-0">
         <div className="flex items-center gap-2.5">
