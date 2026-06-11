@@ -5,6 +5,7 @@ import { useCartStore, useAuthStore, useToastStore, mapBackendOrder } from '../s
 import { mockDb } from '../data/mockDb';
 import { apiClient } from '../api/apiClient';
 import type { Address, Order } from '../data/mockDb';
+import { loadRazorpayScript } from '../utils/loadScript';
 import { FALLBACK_IMAGE } from '../components/ProductCard';
 
 export const Checkout: React.FC = () => {
@@ -148,22 +149,88 @@ export const Checkout: React.FC = () => {
 
     const placeOrderAsync = async () => {
       try {
-        const orderObj = await apiClient.post('/api/v1/orders', {
-          addressId: Number(activeAddress.id),
-          paymentMethod: backendPaymentMethod,
-          couponCode: couponCode,
-          notes: "Placed via frontend"
-        });
+        if (backendPaymentMethod === 'CARD' || backendPaymentMethod === 'UPI') {
+          // RAZORPAY FLOW
+          const isScriptLoaded = await loadRazorpayScript();
+          if (!isScriptLoaded) {
+            addToast('Failed to load Razorpay SDK. Please check your connection.', 'error');
+            return;
+          }
 
-        const mappedOrder = mapBackendOrder(orderObj);
-        setConfirmedOrder(mappedOrder);
-        
-        // Clear cart in backend and locally
-        await apiClient.delete('/api/v1/cart');
-        clearCart();
-        
-        addToast('Payment successful! Your order has been placed.', 'success');
-        setStep(4);
+          // 1. Create order in SwiftCart (with CARD or UPI as payment method)
+          const orderObj = await apiClient.post('/api/v1/orders', {
+            addressId: Number(activeAddress.id),
+            paymentMethod: backendPaymentMethod,
+            couponCode: couponCode,
+            notes: `Placed via frontend (${backendPaymentMethod})`
+          });
+
+          // 2. Create Razorpay order
+          const rzpOrder = await apiClient.post('/api/v1/payments/razorpay/create-order', {
+            orderUuid: orderObj.orderUuid
+          });
+
+          // 3. Initialize Razorpay Checkout
+          const options = {
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID || rzpOrder.keyId,
+            amount: Math.round(rzpOrder.amount * 100),
+            currency: rzpOrder.currency || 'INR',
+            name: 'SwiftCart',
+            description: 'Order Payment',
+            order_id: rzpOrder.razorpayOrderId,
+            handler: async function (response: any) {
+              try {
+                // 4. Verify Payment
+                await apiClient.post('/api/v1/payments/razorpay/verify', {
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpaySignature: response.razorpay_signature,
+                  swiftcartOrderUuid: orderObj.orderUuid
+                });
+
+                // 5. Success cleanup
+                const mappedOrder = mapBackendOrder(orderObj);
+                setConfirmedOrder(mappedOrder);
+                await apiClient.delete('/api/v1/cart');
+                clearCart();
+                addToast('Payment successful! Your order has been placed.', 'success');
+                setStep(4);
+              } catch (verifyErr: any) {
+                addToast('Payment verification failed. Please contact support.', 'error');
+              }
+            },
+            prefill: {
+              name: activeAddress.name,
+              contact: activeAddress.phone,
+              email: user?.email || '',
+            },
+            theme: {
+              color: '#F97316' // swift-orange
+            }
+          };
+
+          // @ts-ignore
+          const rzp = new window.Razorpay(options);
+          rzp.on('payment.failed', function (response: any){
+            addToast(`Payment Failed: ${response.error.description}`, 'error');
+          });
+          rzp.open();
+
+        } else {
+          // COD FLOW
+          const orderObj = await apiClient.post('/api/v1/orders', {
+            addressId: Number(activeAddress.id),
+            paymentMethod: 'COD',
+            couponCode: couponCode,
+            notes: "Placed via frontend (COD)"
+          });
+          const mappedOrder = mapBackendOrder(orderObj);
+          setConfirmedOrder(mappedOrder);
+          await apiClient.delete('/api/v1/cart');
+          clearCart();
+          addToast('Order placed successfully via Cash on Delivery!', 'success');
+          setStep(4);
+        }
       } catch (err: any) {
         addToast(err.message || 'Failed to place order. Please check stock and details.', 'error');
       }
