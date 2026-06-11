@@ -10,7 +10,7 @@ export const QuickReplies: React.FC<QuickRepliesProps> = ({ options, onSelect })
   if (!options || options.length === 0) return null;
 
   return (
-    <div className="flex gap-2 overflow-x-auto px-4 py-2 scrollbar-none snap-x snap-mandatory">
+    <div className="flex gap-2 overflow-x-auto px-4 py-2 no-scrollbar snap-x snap-mandatory">
       {options.map((option, idx) => (
         <motion.button
           key={idx}

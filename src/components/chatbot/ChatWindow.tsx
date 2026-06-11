@@ -74,7 +74,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       </div>
 
       {/* Messages list */}
-      <div className="flex-grow overflow-y-auto bg-swift-bg/30 py-4 scrollbar-none">
+      <div className="flex-grow overflow-y-auto bg-swift-bg/30 py-4 no-scrollbar">
         {messages.map((msg) => (
           <ChatMessage key={msg.id} message={msg} />
         ))}
