@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 export const loadRazorpayScript = (): Promise<boolean> => {
   return new Promise((resolve) => {
     if (window.Razorpay) {
@@ -15,3 +21,4 @@ export const loadRazorpayScript = (): Promise<boolean> => {
     document.body.appendChild(script);
   });
 };
+
