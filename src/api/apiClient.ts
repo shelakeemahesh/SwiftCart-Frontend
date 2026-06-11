@@ -77,7 +77,13 @@ async function request(path: string, options: RequestOptions = {}): Promise<any>
   // Handle empty responses
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
-    return await response.json();
+    const json = await response.json();
+    console.log("apiClient received JSON:", json);
+    if (json && typeof json === 'object' && 'status' in json && 'message' in json && 'data' in json) {
+      console.log("apiClient unwrapped data:", json.data);
+      return json.data;
+    }
+    return json;
   }
   return await response.text();
 }
