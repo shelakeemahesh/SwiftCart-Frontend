@@ -108,7 +108,7 @@ export const Login: React.FC = () => {
 
   const handleSocialLogin = (provider: 'google') => {
     const backendUrl = `${API_BASE_URL}/oauth2/authorize/${provider}`;
-    const redirectUri = `http://localhost:5173/oauth2/callback`;
+    const redirectUri = `${window.location.origin}/oauth2/callback`;
     window.location.href = `${backendUrl}?redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
 
