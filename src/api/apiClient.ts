@@ -42,11 +42,12 @@ async function request(path: string, options: RequestOptions = {}): Promise<any>
         });
         if (refreshResponse.ok) {
           const authData = await refreshResponse.json();
-          localStorage.setItem('sc_access_token', authData.accessToken);
-          localStorage.setItem('sc_refresh_token', authData.refreshToken);
+          const tokenData = authData.data || authData;
+          localStorage.setItem('sc_access_token', tokenData.accessToken);
+          localStorage.setItem('sc_refresh_token', tokenData.refreshToken);
           
           // Retry the original request with the new token
-          headers.set('Authorization', `Bearer ${authData.accessToken}`);
+          headers.set('Authorization', `Bearer ${tokenData.accessToken}`);
           response = await fetch(url.toString(), fetchOptions);
         } else {
           // Refresh failed, clear session
