@@ -33,53 +33,55 @@ export const ProductListing: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [allCatProducts, setAllCatProducts] = useState<Product[]>([]);
 
-  // Fetch initial unfiltered category products to derive available brands and sellers
+  const [resolvedCategoryId, setResolvedCategoryId] = useState<number | undefined>(undefined);
+  const [categoryResolved, setCategoryResolved] = useState(false);
+
   useEffect(() => {
-    const loadInitialFilterValues = async () => {
+    const resolveCategory = async () => {
       try {
-        let categoryId: number | undefined = undefined;
         if (categoryName) {
           const categories = await apiClient.get('/api/v1/categories');
           const matchedCat = categories.find((c: any) => 
             c.slug.toLowerCase() === categoryName.toLowerCase() ||
             c.name.toLowerCase() === categoryName.toLowerCase()
           );
-          if (matchedCat) {
-            categoryId = matchedCat.id;
-          }
+          setResolvedCategoryId(matchedCat ? matchedCat.id : undefined);
+        } else {
+          setResolvedCategoryId(undefined);
         }
+      } catch (e) {
+        setResolvedCategoryId(undefined);
+      }
+      setCategoryResolved(true);
+    };
+    setCategoryResolved(false);
+    resolveCategory();
+  }, [categoryName]);
+
+  useEffect(() => {
+    if (!categoryResolved) return;
+    const loadInitialFilterValues = async () => {
+      try {
         const params: Record<string, string> = { page: '0', size: '100' };
-        if (categoryId) params.categoryId = String(categoryId);
+        if (resolvedCategoryId) params.categoryId = String(resolvedCategoryId);
         const response = await apiClient.get('/api/v1/products', { params });
         const mapped = (response.content || []).map(mapBackendProduct);
         setAllCatProducts(mapped);
       } catch (e) {}
     };
     loadInitialFilterValues();
-  }, [categoryName]);
+  }, [categoryResolved, resolvedCategoryId]);
 
-  // Fetch products with selected filters applied
   useEffect(() => {
+    if (!categoryResolved) return;
     const loadProducts = async () => {
       try {
-        let categoryId: number | undefined = undefined;
-        if (categoryName) {
-          const categories = await apiClient.get('/api/v1/categories');
-          const matchedCat = categories.find((c: any) => 
-            c.slug.toLowerCase() === categoryName.toLowerCase() ||
-            c.name.toLowerCase() === categoryName.toLowerCase()
-          );
-          if (matchedCat) {
-            categoryId = matchedCat.id;
-          }
-        }
-        
         const params: Record<string, string> = {
           page: '0',
           size: '100',
           inStock: inStockOnly ? 'true' : 'false'
         };
-        if (categoryId) params.categoryId = String(categoryId);
+        if (resolvedCategoryId) params.categoryId = String(resolvedCategoryId);
         if (minPrice > 0) params.minPrice = String(minPrice);
         if (maxPrice < 80000) params.maxPrice = String(maxPrice);
         if (selectedRating !== null) params.rating = String(selectedRating);
@@ -113,7 +115,7 @@ export const ProductListing: React.FC = () => {
       }
     };
     loadProducts();
-  }, [categoryName, selectedBrands, minPrice, maxPrice, selectedRating, selectedDiscounts, inStockOnly, selectedSellers, sortBy]);
+  }, [categoryResolved, resolvedCategoryId, selectedBrands, minPrice, maxPrice, selectedRating, selectedDiscounts, inStockOnly, selectedSellers, sortBy]);
 
   // Derive unique brands and sellers from products in this category
   const availableBrands = useMemo(() => {

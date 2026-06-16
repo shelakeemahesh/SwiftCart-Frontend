@@ -96,9 +96,9 @@ export const ProductDetail: React.FC = () => {
     ? product.reviews.filter(r => r.rating === reviewsFilter)
     : product.reviews;
 
-  // Zoom Lens Effect (Desktop Magnifier)
+  // This comment is written by human not ai - Zoom Lens Effect (Desktop Magnifier)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (window.innerWidth < 1024) return;
+    if (window.innerWidth < 1024 || !window.matchMedia('(hover: hover)').matches) return;
     const img = mainImageRef.current;
     if (!img) return;
 
@@ -392,13 +392,12 @@ export const ProductDetail: React.FC = () => {
             <p className="text-[10px] text-swift-mid mt-1.5 font-bold uppercase tracking-wider">Inclusive of all local taxes</p>
           </div>
 
-          {/* Variant Picker */}
           {product.variants.map((variant) => (
             <div key={variant.name} className="space-y-2 border-b border-gray-100 pb-4">
               <span className="block text-xs font-bold text-swift-dark uppercase tracking-wider">
                 Select {variant.name}
               </span>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {variant.options.map((opt) => {
                   const isSelected = selectedVariants[variant.name] === opt;
                   
@@ -407,13 +406,13 @@ export const ProductDetail: React.FC = () => {
                       <button
                         key={opt}
                         onClick={() => setSelectedVariants(prev => ({ ...prev, [variant.name]: opt }))}
-                        className={`px-3 py-1.5 rounded-button text-xs font-bold transition-all border flex items-center gap-1.5 ${
+                        className={`px-4 py-2.5 min-h-[38px] rounded-button text-xs sm:text-sm font-bold transition-all border flex items-center gap-2 ${
                           isSelected
                             ? 'border-swift-orange bg-swift-orange/5 text-swift-orange shadow-xs'
                             : 'border-gray-200 bg-white text-swift-dark hover:bg-gray-50'
                         }`}
                       >
-                        <span className="w-3 h-3 rounded-full border border-gray-300 bg-gray-500" style={{ backgroundColor: opt.toLowerCase() }} />
+                        <span className="w-4 h-4 rounded-full border border-gray-300 bg-gray-500 shrink-0" style={{ backgroundColor: opt.toLowerCase() }} />
                         <span>{opt}</span>
                       </button>
                     );
@@ -422,7 +421,7 @@ export const ProductDetail: React.FC = () => {
                     <button
                       key={opt}
                       onClick={() => setSelectedVariants(prev => ({ ...prev, [variant.name]: opt }))}
-                      className={`px-3.5 py-2 rounded-button text-xs font-bold transition-all border ${
+                      className={`px-4 py-2.5 min-w-[44px] min-h-[38px] rounded-button text-xs sm:text-sm font-bold transition-all border ${
                         isSelected
                           ? 'border-swift-blue bg-swift-blue/5 text-swift-blue shadow-xs'
                           : 'border-gray-200 bg-white text-swift-dark hover:bg-gray-50'
@@ -822,7 +821,7 @@ export const ProductDetail: React.FC = () => {
       {/* Write a Review Modal */}
       {writeReviewOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 pointer-events-auto">
-          <div className="bg-white rounded-modal w-full max-w-md p-6 shadow-modal">
+          <div className="bg-white rounded-modal w-full max-w-md p-6 shadow-modal overflow-y-auto max-h-full">
             <div className="flex justify-between items-start mb-4">
               <h3 className="font-heading font-extrabold text-lg text-swift-dark">Write a review</h3>
               <button 

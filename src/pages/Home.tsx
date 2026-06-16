@@ -129,16 +129,16 @@ export const Home: React.FC = () => {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const trending = await apiClient.get('/api/v1/products/trending');
+        const [trending, arrivals, deals] = await Promise.all([
+          apiClient.get('/api/v1/products/trending'),
+          apiClient.get('/api/v1/products/new-arrivals'),
+          apiClient.get('/api/v1/products/deals')
+        ]);
+
         const mappedTrending = (trending || []).map(mapBackendProduct);
         setTrendingProducts(mappedTrending);
-
-        const arrivals = await apiClient.get('/api/v1/products/new-arrivals');
         setNewArrivals((arrivals || []).map(mapBackendProduct));
-
-        const deals = await apiClient.get('/api/v1/products/deals');
         setFlashDeals((deals || []).map(mapBackendProduct));
-        
         setBestSellers(mappedTrending.slice(0, 4));
       } catch (err) {
         console.error("Failed to load home product sections", err);

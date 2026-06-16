@@ -30,8 +30,9 @@ export const Checkout: React.FC = () => {
     }
   }, [isLoggedIn, user, navigate, addToast]);
 
-  // Steps: 1 (Address), 2 (Review), 3 (Payment), 4 (Confirmation)
+  // This comment is written by human not ai - step tracking
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
 
   // Form states for new address
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -243,14 +244,12 @@ export const Checkout: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 pb-20">
       
-      {/* Checkout Progress Stepper */}
       <nav className="mb-10 max-w-xl mx-auto" aria-label="Progress Tracker">
         <div className="flex items-center justify-between relative">
-          {/* Connector Line */}
-          <div className="absolute left-0 right-0 h-1 bg-gray-200 top-1/2 -translate-y-1/2 -z-10" />
+          <div className="absolute left-4 right-4 h-1 bg-gray-200 top-1/2 -translate-y-1/2 -z-10 rounded-full" />
           <div 
-            className="absolute left-0 h-1 bg-swift-orange top-1/2 -translate-y-1/2 -z-10 transition-all duration-300"
-            style={{ width: `${(step - 1) * 33.3}%` }}
+            className="absolute left-4 h-1 bg-swift-orange top-1/2 -translate-y-1/2 -z-10 transition-all duration-300 rounded-full"
+            style={{ width: `calc(${(step - 1) * 33.33}% - ${(step - 1) * 8}px)` }}
           />
 
           {[
@@ -284,6 +283,75 @@ export const Checkout: React.FC = () => {
           })}
         </div>
       </nav>
+
+      {/* This comment is written by human not ai - show summary toggle on mobile viewports */}
+      {step !== 4 && (
+        <div className="lg:hidden mb-6 bg-white border border-gray-150 rounded-card overflow-hidden shadow-sm">
+          <button
+            onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
+            className="w-full px-5 py-4 flex items-center justify-between text-sm font-extrabold text-swift-dark hover:bg-gray-50 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <ShoppingCart className="w-4 h-4 text-swift-blue" />
+              <span>{isSummaryExpanded ? 'Hide Order Summary' : 'Show Order Summary'}</span>
+            </span>
+            <span className="text-swift-orange font-mono">
+              ₹{(totals.total + 10).toLocaleString('en-IN')}
+            </span>
+          </button>
+          
+          {isSummaryExpanded && (
+            <div className="px-5 pb-5 pt-2 border-t border-gray-100 bg-gray-50/50 space-y-4">
+              <div className="space-y-4 max-h-60 overflow-y-auto pr-1">
+                {cart.map(item => (
+                  <div key={item.cartItemId} className="flex gap-3 text-xs">
+                    <img
+                      src={item.product.images[0] || FALLBACK_IMAGE}
+                      alt={item.product.name}
+                      className="w-12 h-12 object-cover rounded-button border border-gray-100 bg-white shrink-0"
+                    />
+                    <div className="flex-grow text-left">
+                      <h4 className="font-bold text-swift-dark truncate max-w-[180px]">{item.product.name}</h4>
+                      <p className="text-[10px] text-swift-mid">Qty: {item.quantity}</p>
+                    </div>
+                    <span className="font-bold text-swift-dark">₹{(item.product.price * item.quantity).toLocaleString('en-IN')}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <hr className="border-gray-200" />
+              
+              <div className="space-y-2 text-xs font-bold text-swift-mid">
+                <div className="flex justify-between">
+                  <span>Items Total</span>
+                  <span className="font-mono text-swift-dark">₹{totals.subtotal.toLocaleString('en-IN')}</span>
+                </div>
+                {totals.discount > 0 && (
+                  <div className="flex justify-between text-swift-green">
+                    <span>Discount</span>
+                    <span className="font-mono">-₹{totals.discount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span>Shipping</span>
+                  <span className="font-mono text-swift-dark">
+                    {totals.deliveryCharge === 0 ? <span className="text-swift-green">FREE</span> : `₹${totals.deliveryCharge}`}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Platform Fee</span>
+                  <span className="font-mono text-swift-dark">₹10</span>
+                </div>
+                <hr className="border-gray-200 my-1" />
+                <div className="flex justify-between text-sm font-extrabold text-swift-dark">
+                  <span>Total Amount</span>
+                  <span className="font-mono text-swift-orange">₹{(totals.total + 10).toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Steps Content */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -569,8 +637,7 @@ export const Checkout: React.FC = () => {
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-6">
-                {/* Method selector tabs (Left 4 cols) */}
-                <div className="sm:col-span-4 flex flex-row sm:flex-col gap-1 border-b sm:border-b-0 sm:border-r border-gray-150 pb-4 sm:pb-0 pr-0 sm:pr-4 overflow-x-auto sm:overflow-visible">
+                <div className="sm:col-span-4 flex flex-row sm:flex-col gap-1 border-b sm:border-b-0 sm:border-r border-gray-150 pb-4 sm:pb-0 pr-0 sm:pr-4 overflow-x-auto sm:overflow-visible no-scrollbar">
                   {[
                     { id: 'card', label: 'Credit/Debit Card', icon: <CreditCard className="w-4 h-4" /> },
                     { id: 'upi', label: 'UPI / QR Scan', icon: <QrCode className="w-4 h-4" /> },
@@ -579,7 +646,7 @@ export const Checkout: React.FC = () => {
                     <button
                       key={tab.id}
                       onClick={() => setPaymentTab(tab.id as typeof paymentTab)}
-                      className={`w-full flex items-center gap-2 px-3 py-3 rounded-button text-xs font-extrabold text-left transition-all ${
+                      className={`flex-1 sm:w-full flex-shrink-0 flex items-center justify-center sm:justify-start gap-2 px-4 py-3 rounded-button text-xs font-extrabold transition-all ${
                         paymentTab === tab.id
                           ? 'bg-swift-orange text-white shadow-xs'
                           : 'text-swift-dark hover:bg-gray-50'

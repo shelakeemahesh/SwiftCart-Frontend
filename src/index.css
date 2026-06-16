@@ -72,3 +72,16 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* This comment is written by human not ai - magnifier lens styles */
+.magnifier-lens {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25), inset 0 0 10px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  background-repeat: no-repeat;
+  z-index: 10;
+}

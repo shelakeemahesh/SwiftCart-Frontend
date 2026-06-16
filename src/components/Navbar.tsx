@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, ShoppingCart, User, MapPin, Heart, LogOut, ChevronDown, X, Store } from 'lucide-react';
+import { Search, ShoppingCart, User, MapPin, Heart, LogOut, ChevronDown, X, Store, Menu, HelpCircle, FileText, ShoppingBag } from 'lucide-react';
 import { useCartStore, useAuthStore, useToastStore, useWishlistStore, mapBackendProduct } from '../store/useSwiftStore';
 import { apiClient } from '../api/apiClient';
 import type { Product } from '../data/mockDb';
 import { FALLBACK_IMAGE } from './ProductCard';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const CATEGORIES = ['Electronics', 'Fashion', 'Home', 'Grocery', 'Beauty', 'Sports', 'Toys', 'Books'];
 
@@ -22,6 +23,7 @@ export const Navbar: React.FC = () => {
   const [suggestions, setSuggestions] = useState<{ products: Product[]; categories: string[] }>({ products: [], categories: [] });
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Pincode state
   const [pincode, setPincode] = useState(() => localStorage.getItem('sc_pincode') || '');
@@ -77,6 +79,18 @@ export const Navbar: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Disable body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,7 +231,16 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center justify-between gap-4">
             
             {/* Left Cluster: Logo & Location */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 md:gap-6">
+              {/* Hamburger Menu Toggle */}
+              <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="lg:hidden p-2 text-swift-dark hover:text-swift-orange rounded-full hover:bg-gray-150/40 transition-colors"
+                aria-label="Open Menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+
               {/* Logo */}
               <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
                 <div className="bg-swift-orange text-white p-1.5 rounded-button shadow-sm">
@@ -609,6 +632,190 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Mobile Sidebar Navigation Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black z-50 lg:hidden"
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] bg-white z-50 shadow-modal flex flex-col lg:hidden border-r border-gray-100"
+            >
+              <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+                  <div className="bg-swift-orange text-white p-1.5 rounded-button shadow-sm">
+                    <ShoppingCart className="w-5 h-5" strokeWidth={2.5} />
+                  </div>
+                  <span className="font-heading font-extrabold text-xl tracking-tight text-swift-dark flex items-center">
+                    Swift<span className="text-swift-orange">Cart</span>
+                  </span>
+                </Link>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex-grow overflow-y-auto p-4 space-y-6">
+                <div className="bg-swift-bg border border-gray-100 rounded-card p-4">
+                  {isLoggedIn ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-swift-blue text-white rounded-full flex items-center justify-center font-bold font-heading text-sm">
+                          {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-bold text-sm text-swift-dark truncate">{user?.name}</h4>
+                          <p className="text-xs text-swift-mid truncate">{user?.email}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200/55">
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center justify-center gap-1.5 py-2 bg-white border border-gray-250/60 rounded-button text-xs font-bold text-swift-dark hover:bg-gray-50 transition-colors"
+                        >
+                          <User className="w-3.5 h-3.5 text-swift-blue" />
+                          <span>Dashboard</span>
+                        </Link>
+                        <Link
+                          to="/dashboard?tab=orders"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center justify-center gap-1.5 py-2 bg-white border border-gray-250/60 rounded-button text-xs font-bold text-swift-dark hover:bg-gray-50 transition-colors"
+                        >
+                          <ShoppingBag className="w-3.5 h-3.5 text-swift-green" />
+                          <span>My Orders</span>
+                        </Link>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-2 space-y-2">
+                      <p className="text-xs text-swift-mid font-semibold">Log in for personalized tracking, wishlist, and offers</p>
+                      <Link
+                        to="/login"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-full py-2 bg-swift-blue hover:bg-swift-blue-dark text-white rounded-button font-bold text-xs shadow-sm flex items-center justify-center gap-1.5"
+                      >
+                        <User className="w-3.5 h-3.5" />
+                        <span>Log In / Register</span>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2.5">
+                  <div className="text-[10px] uppercase font-bold text-swift-mid tracking-wider px-2">Merchant Center</div>
+                  {isLoggedIn && user?.role === 'ADMIN' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-swift-orange/10 border border-swift-orange/20 rounded-button text-xs font-bold text-swift-orange hover:bg-swift-orange/15 transition-all"
+                    >
+                      <Store className="w-4 h-4" />
+                      <span>🏪 Admin Control Panel</span>
+                    </Link>
+                  )}
+                  {isLoggedIn && user?.role === 'SELLER' && (
+                    <Link
+                      to="/seller/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-swift-blue/10 border border-swift-blue/20 rounded-button text-xs font-bold text-swift-blue hover:bg-swift-blue/15 transition-all"
+                    >
+                      <Store className="w-4 h-4" />
+                      <span>🏪 Seller Dashboard</span>
+                    </Link>
+                  )}
+                  {(!isLoggedIn || user?.role === 'CUSTOMER') && (
+                    <Link
+                      to="/seller/register"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-swift-blue/10 border border-swift-blue/20 rounded-button text-xs font-bold text-swift-blue hover:bg-swift-blue/15 transition-all"
+                    >
+                      <Store className="w-4 h-4" />
+                      <span>🚀 Become a Seller</span>
+                    </Link>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-[10px] uppercase font-bold text-swift-mid tracking-wider px-2">Shop by Category</div>
+                  <div className="grid grid-cols-1 border border-gray-150/60 rounded-card overflow-hidden">
+                    {categories.map((category) => (
+                      <Link
+                        key={category}
+                        to={`/category/${category}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="px-4 py-2.5 text-xs font-bold text-swift-dark hover:bg-swift-bg border-b border-gray-150/40 last:border-b-0 flex items-center justify-between"
+                      >
+                        <span>{category}</span>
+                        <span className="text-swift-mid text-[10px]">&rarr;</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-[10px] uppercase font-bold text-swift-mid tracking-wider px-2">Support & Info</div>
+                  <div className="flex flex-col gap-1 px-2">
+                    <Link
+                      to="/info/about"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 text-xs font-semibold text-swift-dark hover:text-swift-orange py-1.5"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5 text-swift-mid" />
+                      <span>About SwiftCart</span>
+                    </Link>
+                    <Link
+                      to="/info/returns"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 text-xs font-semibold text-swift-dark hover:text-swift-orange py-1.5"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-swift-mid" />
+                      <span>Return & Refund Policy</span>
+                    </Link>
+                    <Link
+                      to="/info/privacy"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 text-xs font-semibold text-swift-dark hover:text-swift-orange py-1.5"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-swift-mid" />
+                      <span>Privacy & Terms</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {isLoggedIn && (
+                <div className="p-4 border-t border-gray-100 bg-gray-50">
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                      addToast('Successfully logged out', 'info');
+                      navigate('/');
+                    }}
+                    className="w-full py-2.5 border border-swift-red text-swift-red hover:bg-red-50 rounded-button text-xs font-bold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 };

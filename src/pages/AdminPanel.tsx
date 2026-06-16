@@ -563,8 +563,67 @@ export const AdminPanel: React.FC = () => {
       {/* Grid Layout: Tabs Navigation & Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
-        {/* Left Navigation Menu */}
-        <div className="lg:col-span-1 space-y-2">
+        {/* Mobile Tab Navigation Menu */}
+        <div className="lg:hidden flex gap-1.5 bg-white border border-gray-100 rounded-card p-2 shadow-sm overflow-x-auto no-scrollbar scroll-smooth">
+          <button 
+            onClick={() => setActiveTab('analytics')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-button text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'analytics' ? 'bg-swift-dark text-white' : 'text-swift-dark hover:bg-swift-bg'}`}
+          >
+            <LayoutDashboard className="w-3.5 h-3.5 text-swift-orange" />
+            <span>Analytics</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('users')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-button text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'users' ? 'bg-swift-dark text-white' : 'text-swift-dark hover:bg-swift-bg'}`}
+          >
+            <Users className="w-3.5 h-3.5 text-swift-blue" />
+            <span>Users</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('products')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-button text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'products' ? 'bg-swift-dark text-white' : 'text-swift-dark hover:bg-swift-bg'}`}
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-swift-green" />
+            <span>Catalog</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('coupons')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-button text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'coupons' ? 'bg-swift-dark text-white' : 'text-swift-dark hover:bg-swift-bg'}`}
+          >
+            <Ticket className="w-3.5 h-3.5 text-swift-red" />
+            <span>Coupons</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('flash')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-button text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'flash' ? 'bg-swift-dark text-white' : 'text-swift-dark hover:bg-swift-bg'}`}
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            <span>Flash Deals</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('csv')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-button text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'csv' ? 'bg-swift-dark text-white' : 'text-swift-dark hover:bg-swift-bg'}`}
+          >
+            <Upload className="w-3.5 h-3.5 text-purple-500" />
+            <span>Bulk CSV</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('testing')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-button text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'testing' ? 'bg-swift-orange text-white' : 'text-swift-dark hover:bg-swift-orange/10 hover:text-swift-orange'}`}
+          >
+            <Code className="w-3.5 h-3.5" />
+            <span>Test Deck</span>
+          </button>
+        </div>
+
+        {/* Left Navigation Menu (Desktop Sidebar) */}
+        <div className="hidden lg:block lg:col-span-1 space-y-4">
           <div className="bg-white border border-gray-100 rounded-card p-4 shadow-sm space-y-1">
             <div className="text-[10px] uppercase font-bold text-swift-mid tracking-wider px-3 mb-2">Management Tabs</div>
             
@@ -640,13 +699,13 @@ export const AdminPanel: React.FC = () => {
                 <span>Redis Rate Limit:</span>
                 <span className="text-swift-green">ONLINE</span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between font-bold text-swift-mid">
                 <span>Elasticsearch Index:</span>
-                <span className="text-swift-green">ONLINE</span>
+                <span>DECOMMISSIONED</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span>Kafka Producer:</span>
-                <span className="text-swift-green">ONLINE</span>
+              <div className="flex items-center justify-between font-bold text-swift-mid">
+                <span>Kafka Broker:</span>
+                <span>DECOMMISSIONED</span>
               </div>
             </div>
           </div>
