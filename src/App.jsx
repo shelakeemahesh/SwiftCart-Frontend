@@ -15,6 +15,7 @@ import { Footer } from "./components/Footer";
 import { CartDrawer } from "./components/CartDrawer";
 import { ToastContainer } from "./components/ToastContainer";
 import { ChatWidget } from "./components/chatbot/ChatWidget";
+import { LiveActivityBanner } from "./components/LiveActivityBanner";
 
 // Page Components
 import { Home } from "./pages/Home";
@@ -131,6 +132,7 @@ const App = () => {
           {/* Page Footer */}
           <Footer />
           <ChatWidget />
+          <LiveActivityBanner />
         </div>
       </Router>
     </QueryClientProvider>

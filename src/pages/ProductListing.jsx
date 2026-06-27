@@ -13,6 +13,16 @@ export const ProductListing = () => {
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(80000);
+  const [debouncedMinPrice, setDebouncedMinPrice] = useState(0);
+  const [debouncedMaxPrice, setDebouncedMaxPrice] = useState(80000);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedMinPrice(minPrice);
+      setDebouncedMaxPrice(maxPrice);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [minPrice, maxPrice]);
   const [selectedRating, setSelectedRating] = useState(null);
   const [selectedDiscounts, setSelectedDiscounts] = useState([]);
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -82,8 +92,8 @@ export const ProductListing = () => {
           inStock: inStockOnly ? "true" : "false",
         };
         if (resolvedCategoryId) params.categoryId = String(resolvedCategoryId);
-        if (minPrice > 0) params.minPrice = String(minPrice);
-        if (maxPrice < 80000) params.maxPrice = String(maxPrice);
+        if (debouncedMinPrice > 0) params.minPrice = String(debouncedMinPrice);
+        if (debouncedMaxPrice < 80000) params.maxPrice = String(debouncedMaxPrice);
         if (selectedRating !== null) params.rating = String(selectedRating);
         if (selectedDiscounts.length > 0) {
           const minDisc = Math.min(...selectedDiscounts);
@@ -118,8 +128,8 @@ export const ProductListing = () => {
     categoryResolved,
     resolvedCategoryId,
     selectedBrands,
-    minPrice,
-    maxPrice,
+    debouncedMinPrice,
+    debouncedMaxPrice,
     selectedRating,
     selectedDiscounts,
     inStockOnly,

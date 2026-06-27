@@ -438,6 +438,8 @@ export const useCartStore = create((set, get) => ({
   coupon: null,
   selectedAddressId: null,
 
+
+
   setCartOpen: (open) => set({ isCartOpen: open }),
 
   fetchCart: async () => {
@@ -454,6 +456,8 @@ export const useCartStore = create((set, get) => ({
   },
 
   addToCart: async (product, quantity, selectedVariant) => {
+
+
     const isLoggedIn = useAuthStore.getState().isLoggedIn;
     if (isLoggedIn) {
       try {

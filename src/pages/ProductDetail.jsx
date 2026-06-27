@@ -11,6 +11,10 @@ import {
   ThumbsUp,
   Send,
   X,
+  Bell,
+  LineChart,
+  TrendingDown,
+  Mail,
 } from "lucide-react";
 import { mockDb } from "../data/mockDb";
 import {
@@ -652,7 +656,7 @@ export const ProductDetail = () => {
       <section className="bg-white border border-gray-100 rounded-card overflow-hidden shadow-card mb-16">
         {/* Tabs Headers */}
         <div className="flex border-b border-gray-100 bg-gray-50/50">
-          {["highlights", "specs", "reviews"].map((tab) => (
+          {["highlights", "specs", "reviews", "priceHistory"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -666,7 +670,9 @@ export const ProductDetail = () => {
                 ? "Product Highlights"
                 : tab === "specs"
                   ? "Specifications"
-                  : `Reviews (${product.reviews.length})`}
+                  : tab === "priceHistory"
+                    ? "Price Trends & Alerts"
+                    : `Reviews (${product.reviews.length})`}
             </button>
           ))}
         </div>
@@ -887,6 +893,10 @@ export const ProductDetail = () => {
               </div>
             </div>
           )}
+
+          {activeTab === "priceHistory" && (
+            <PriceHistoryTab slug={product.slug} currentPrice={product.price} />
+          )}
         </div>
       </section>
 
@@ -1086,3 +1096,225 @@ export const ProductDetail = () => {
     </div>
   );
 };
+
+const PriceHistoryTab = ({ slug, currentPrice }) => {
+  const [history, setHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [targetPrice, setTargetPrice] = useState("");
+  const [alertEmail, setAlertEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { addToast } = useToastStore();
+  const { isLoggedIn, user } = useAuthStore();
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const res = await apiClient.get(`/api/v1/products/${slug}/price-history`);
+        setHistory(res || []);
+      } catch (err) {
+        console.error("Failed to load price history", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchHistory();
+  }, [slug]);
+
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      setAlertEmail(user.email || "");
+      // Default target price to 10% discount
+      setTargetPrice(Math.round(currentPrice * 0.9));
+    }
+  }, [isLoggedIn, user, currentPrice]);
+
+  const handleCreateAlert = async (e) => {
+    e.preventDefault();
+    if (!targetPrice || Number(targetPrice) >= currentPrice) {
+      addToast("Target price must be lower than the current price.", "error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await apiClient.post(`/api/v1/products/${slug}/alerts`, {
+        targetPrice: Number(targetPrice),
+        email: alertEmail,
+      });
+      addToast(`Price drop alert set successfully at ₹${targetPrice}!`, "success");
+    } catch (err) {
+      addToast("Failed to configure price alert. Please try again.", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="py-12 text-center text-xs font-bold text-swift-mid">
+        Loading historical pricing trends...
+      </div>
+    );
+  }
+
+  // Generate SVG coordinates
+  const svgWidth = 460;
+  const svgHeight = 150;
+  const paddingX = 40;
+  const paddingY = 20;
+
+  const getSvgCoordinates = () => {
+    if (history.length < 2) return { pathD: "", areaD: "", points: [] };
+
+    const prices = history.map((h) => Number(h.price));
+    const minPrice = Math.min(...prices) * 0.95;
+    const maxPrice = Math.max(...prices) * 1.05;
+    const priceRange = maxPrice - minPrice || 1;
+
+    const points = history.map((item, idx) => {
+      const x = paddingX + (idx / (history.length - 1)) * (svgWidth - paddingX * 2);
+      const y = svgHeight - paddingY - ((Number(item.price) - minPrice) / priceRange) * (svgHeight - paddingY * 2);
+      
+      const dateObj = new Date(item.recordedAt);
+      const dateLabel = dateObj.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+      
+      return { x, y, price: item.price, dateLabel };
+    });
+
+    const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+    const areaD = `${pathD} L ${points[points.length - 1].x} ${svgHeight - paddingY} L ${points[0].x} ${svgHeight - paddingY} Z`;
+
+    return { pathD, areaD, points };
+  };
+
+  const { pathD, areaD, points } = getSvgCoordinates();
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
+      {/* Chart Panel */}
+      <div className="lg:col-span-7 bg-gray-50/50 p-4 border border-gray-100 rounded-card space-y-4">
+        <h4 className="font-heading font-extrabold text-sm text-swift-dark flex items-center gap-1.5">
+          <LineChart className="w-4 h-4 text-swift-orange" />
+          <span>30-Day Price Influx</span>
+        </h4>
+
+        {history.length < 2 ? (
+          <p className="text-center text-xs text-swift-mid py-8">
+            No historical pricing details available yet.
+          </p>
+        ) : (
+          <div className="relative">
+            <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-auto overflow-visible">
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#F97316" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#F97316" stopOpacity="0.0" />
+                </linearGradient>
+              </defs>
+
+              {/* Grid Lines */}
+              <line x1={paddingX} y1={paddingY} x2={svgWidth - paddingX} y2={paddingY} stroke="#E5E7EB" strokeDasharray="3" />
+              <line x1={paddingX} y1={svgHeight - paddingY} x2={svgWidth - paddingX} y2={svgHeight - paddingY} stroke="#E5E7EB" />
+
+              {/* Area Under Path */}
+              <path d={areaD} fill="url(#chartGrad)" />
+
+              {/* Stroke Path */}
+              <path d={pathD} fill="none" stroke="#F97316" strokeWidth="2.5" strokeLinecap="round" />
+
+              {/* Points & Tooltips */}
+              {points.map((p, idx) => (
+                <g key={idx} className="group cursor-pointer">
+                  <circle cx={p.x} cy={p.y} r="4" fill="#FFFFFF" stroke="#F97316" strokeWidth="2" className="transition-all hover:r-6" />
+                  
+                  {/* Tooltip Overlay */}
+                  <g className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <rect x={p.x - 40} y={p.y - 32} width="80" height="24" rx="4" fill="#1F2937" />
+                    <text x={p.x} y={p.y - 16} fill="#FFFFFF" fontSize="9" fontWeight="bold" textAnchor="middle">
+                      ₹{p.price}
+                    </text>
+                  </g>
+
+                  {/* Date labels at bottom */}
+                  {(idx === 0 || idx === points.length - 1 || idx === Math.floor(points.length / 2)) && (
+                    <text x={p.x} y={svgHeight - 4} fill="#9CA3AF" fontSize="8" fontWeight="bold" textAnchor="middle">
+                      {p.dateLabel}
+                    </text>
+                  )}
+                </g>
+              ))}
+            </svg>
+          </div>
+        )}
+      </div>
+
+      {/* Alert Subscription Panel */}
+      <div className="lg:col-span-5 bg-white border border-gray-150 rounded-card p-6 flex flex-col justify-between">
+        <div className="space-y-3">
+          <h4 className="font-heading font-extrabold text-sm text-swift-dark flex items-center gap-1.5">
+            <Bell className="w-4 h-4 text-swift-blue animate-swing" />
+            <span>Notify Me on Price Drop</span>
+          </h4>
+          <p className="text-xs text-swift-mid leading-relaxed">
+            Set your target purchase budget. We will trigger an automated alert notification straight to your email inbox the moment price hits your goal!
+          </p>
+        </div>
+
+        {isLoggedIn ? (
+          <form onSubmit={handleCreateAlert} className="space-y-3 mt-4">
+            <div>
+              <label className="block text-[10px] font-bold text-swift-mid uppercase tracking-wide mb-1">
+                Target Budget Pricing (INR) *
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-xs text-swift-mid">
+                  ₹
+                </span>
+                <input
+                  type="number"
+                  placeholder={`Less than ₹${currentPrice}`}
+                  value={targetPrice}
+                  onChange={(e) => setTargetPrice(e.target.value)}
+                  className="w-full pl-7 pr-3 py-2 border border-gray-250 rounded-button text-xs font-bold focus:border-swift-orange focus:outline-none"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-swift-mid uppercase tracking-wide mb-1">
+                Notification Email Address *
+              </label>
+              <input
+                type="email"
+                placeholder="email@example.com"
+                value={alertEmail}
+                onChange={(e) => setAlertEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-250 rounded-button text-xs focus:border-swift-orange focus:outline-none"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-2.5 bg-swift-orange hover:bg-swift-orange-hover text-white rounded-button font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition-all mt-4 disabled:opacity-50"
+            >
+              <TrendingDown className="w-4 h-4" />
+              <span>{isSubmitting ? "Configuring..." : "Activate Price Alert"}</span>
+            </button>
+          </form>
+        ) : (
+          <div className="bg-gray-50 border border-gray-100 rounded-card p-4 text-center mt-4">
+            <Mail className="w-8 h-8 text-swift-mid mx-auto mb-2 opacity-50" />
+            <p className="text-xs text-swift-mid font-semibold leading-relaxed">
+              Please log in to receive automated price drop notifications in your inbox.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+

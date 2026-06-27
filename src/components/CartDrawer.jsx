@@ -84,8 +84,7 @@ export const CartDrawer = () => {
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-swift-orange" />
                 <h3 className="font-heading font-extrabold text-lg text-swift-dark">
-                  Shopping Cart (
-                  {cart.reduce((sum, item) => sum + item.quantity, 0)})
+                  Shopping Drawer
                 </h3>
               </div>
               <button
@@ -97,7 +96,7 @@ export const CartDrawer = () => {
               </button>
             </div>
 
-            {/* Cart Items List */}
+            {/* Content Body */}
             <div className="flex-grow overflow-y-auto p-4 space-y-4">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-8 space-y-4">
@@ -135,7 +134,6 @@ export const CartDrawer = () => {
                       }}
                     />
 
-                    {/* Content Details */}
                     <div className="flex-grow min-w-0 pr-6">
                       <h4 className="text-sm font-bold text-swift-dark truncate group-hover:text-swift-orange transition-colors">
                         {item.product.name}
@@ -146,7 +144,6 @@ export const CartDrawer = () => {
                           "SwiftCart"}
                       </p>
 
-                      {/* Selected Variants */}
                       {Object.keys(item.selectedVariant).length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
                           {Object.entries(item.selectedVariant).map(
@@ -157,14 +154,12 @@ export const CartDrawer = () => {
                               >
                                 {key}: {val}
                               </span>
-                            ),
+                            )
                           )}
                         </div>
                       )}
 
-                      {/* Controls and Price */}
                       <div className="flex items-center justify-between mt-3">
-                        {/* Stepper */}
                         <div className="flex items-center bg-white border border-gray-200 rounded-button">
                           <button
                             onClick={() =>
@@ -189,7 +184,6 @@ export const CartDrawer = () => {
                           </button>
                         </div>
 
-                        {/* Price */}
                         <div className="text-right">
                           <span className="font-bold text-sm text-swift-dark">
                             ₹
@@ -209,13 +203,12 @@ export const CartDrawer = () => {
                       </div>
                     </div>
 
-                    {/* Delete Item Button */}
                     <button
                       onClick={() => {
                         removeFromCart(item.cartItemId);
                         addToast(
                           `${item.product.name} removed from cart`,
-                          "info",
+                          "info"
                         );
                       }}
                       className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-swift-red hover:bg-red-50 rounded-full transition-all"
@@ -228,7 +221,6 @@ export const CartDrawer = () => {
               )}
             </div>
 
-            {/* Footer Summary & Action */}
             {cart.length > 0 && (
               <div className="p-4 border-t border-gray-100 bg-gray-50/50 space-y-4">
                 <div className="space-y-1.5 text-sm">
@@ -272,12 +264,6 @@ export const CartDrawer = () => {
                   >
                     <span>Proceed to Checkout</span>
                     <ArrowRight className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setCartOpen(false)}
-                    className="w-full text-center text-xs font-bold text-swift-blue hover:underline py-1"
-                  >
-                    Continue Shopping
                   </button>
                 </div>
               </div>
