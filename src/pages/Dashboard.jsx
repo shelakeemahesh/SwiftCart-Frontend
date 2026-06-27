@@ -144,7 +144,7 @@ export const Dashboard = () => {
     }
   };
 
-  const handleSaveAddress = (e) => {
+  const handleSaveAddress = async (e) => {
     e.preventDefault();
     if (!addrName || !addrPhone || !addrPincode || !addrLine1) {
       addToast("Please fill out all required address fields", "error");
@@ -164,7 +164,7 @@ export const Dashboard = () => {
       isDefault: addresses.length === 0,
     };
 
-    addAddress(newAddr);
+    await addAddress(newAddr);
     setShowAddrForm(false);
     addToast("Address added successfully!", "success");
     // Reset Form

@@ -12,6 +12,7 @@ import {
   QrCode,
   Wallet,
   Calendar,
+  ShoppingCart,
 } from "lucide-react";
 import {
   useCartStore,
@@ -48,8 +49,13 @@ export const Checkout = () => {
     if (user?.role === "SELLER") {
       addToast("Sellers are not permitted to checkout products.", "error");
       navigate("/seller/dashboard");
+      return;
     }
-  }, [isLoggedIn, user, navigate, addToast]);
+    if (cart.length === 0) {
+      addToast("Your cart is empty. Add some items first!", "warning");
+      navigate("/cart");
+    }
+  }, [isLoggedIn, user, navigate, addToast, cart.length]);
 
   // This comment is written by human not ai - step tracking
   const [step, setStep] = useState(1);
@@ -77,7 +83,7 @@ export const Checkout = () => {
   // Generated Order Details for Confirmation Screen
   const [confirmedOrder, setConfirmedOrder] = useState(null);
 
-  const handleAddAddressSubmit = (e) => {
+  const handleAddAddressSubmit = async (e) => {
     e.preventDefault();
     if (!addrName || !addrPhone || !addrPincode || !addrLine1) {
       addToast("Please fill out all required address fields", "error");
@@ -97,8 +103,12 @@ export const Checkout = () => {
       isDefault: addresses.length === 0,
     };
 
-    addAddress(newAddr);
-    setSelectedAddressId(newAddr.id);
+    const savedAddr = await addAddress(newAddr);
+    if (savedAddr && savedAddr.id) {
+      setSelectedAddressId(String(savedAddr.id));
+    } else {
+      setSelectedAddressId(newAddr.id);
+    }
     addToast("New address saved successfully!", "success");
     // Reset Form
     setShowAddressForm(false);
@@ -186,8 +196,14 @@ export const Checkout = () => {
           }
 
           // 1. Create order in SwiftCart (with CARD or UPI as payment method)
+          const parsedAddrId = parseInt(activeAddress.id, 10);
+          if (isNaN(parsedAddrId)) {
+            addToast("Invalid delivery address. Please select a saved address.", "error");
+            setStep(1);
+            return;
+          }
           const orderObj = await apiClient.post("/api/v1/orders", {
-            addressId: Number(activeAddress.id),
+            addressId: parsedAddrId,
             paymentMethod: backendPaymentMethod,
             couponCode: couponCode,
             notes: `Placed via frontend (${backendPaymentMethod})`,
@@ -254,8 +270,14 @@ export const Checkout = () => {
           rzp.open();
         } else {
           // COD FLOW
+          const parsedCodAddrId = parseInt(activeAddress.id, 10);
+          if (isNaN(parsedCodAddrId)) {
+            addToast("Invalid delivery address. Please select a saved address.", "error");
+            setStep(1);
+            return;
+          }
           const orderObj = await apiClient.post("/api/v1/orders", {
-            addressId: Number(activeAddress.id),
+            addressId: parsedCodAddrId,
             paymentMethod: "COD",
             couponCode: couponCode,
             notes: "Placed via frontend (COD)",

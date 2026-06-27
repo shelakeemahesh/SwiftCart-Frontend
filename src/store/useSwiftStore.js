@@ -355,8 +355,9 @@ export const useAuthStore = create((set, get) => ({
         state: address.state,
         isDefault: !!address.isDefault,
       };
-      await apiClient.post("/api/v1/users/me/addresses", payload);
+      const response = await apiClient.post("/api/v1/users/me/addresses", payload);
       await get().fetchAddresses();
+      return response;
     } catch (e) {
       console.error("Failed to add address in backend", e);
     }
