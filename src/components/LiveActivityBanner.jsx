@@ -1,27 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye, ShoppingBag, ShieldCheck } from "lucide-react";
+import { API_BASE_URL } from "../api/apiClient";
 
 export const LiveActivityBanner = () => {
   const [activeEvent, setActiveEvent] = useState(null);
 
   useEffect(() => {
-    const eventSource = new EventSource("http://localhost:8080/api/v1/activity/stream");
+    let timerId = null;
+    const eventSource = new EventSource(`${API_BASE_URL}/api/v1/activity/stream`);
 
     eventSource.addEventListener("activity-feed", (event) => {
       try {
         const data = JSON.parse(event.data);
+        console.log("Received live activity event:", data);
+
+        if (timerId) {
+          clearTimeout(timerId);
+        }
+
         setActiveEvent(data);
 
         // Auto dismiss after 5 seconds
-        const timer = setTimeout(() => {
+        timerId = setTimeout(() => {
           setActiveEvent(null);
+          timerId = null;
         }, 5000);
-
-        return () => clearTimeout(timer);
       } catch (err) {
         console.error("Failed to parse SSE live activity event", err);
       }
+    });
+
+    eventSource.addEventListener("connected", (event) => {
+      console.log("SSE connection established successfully.");
     });
 
     eventSource.onerror = (err) => {
@@ -29,6 +40,9 @@ export const LiveActivityBanner = () => {
     };
 
     return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
       eventSource.close();
     };
   }, []);
