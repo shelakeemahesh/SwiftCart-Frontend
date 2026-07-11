@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+# SwiftCart Frontend ⚡
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SwiftCart is a premium, full-featured e-commerce application. This repository contains the high-fidelity, responsive frontend React application designed with rich aesthetics, smooth animations, and optimized state management.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🎨 Design System & Visual Excellence
 
-## React Compiler
+- **Brand Colors**: SwiftCart Brand Orange (`#EF9F27`), Accent Deep Blue (`#185FA5`), and Sleek Neutral Grays.
+- **Responsiveness**: Fully optimized for mobile screens (320px+), tablets (768px+), and desktops (1024px+).
+- **Typography & Icons**: Curated fonts (using Outfit/Inter styles) and Lucide React icons.
+- **Animations**: Subtle micro-interactions and transitions driven by Framer Motion.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Technology Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework**: React 18 & TypeScript (via Vite for lightning-fast HMR)
+- **Styling**: Tailwind CSS 3.x
+- **State Management**: Zustand (lightweight, decoupled stores for cart operations, address books, and authentication states)
+- **Server Cache**: React Query (for efficient query invalidations and data syncing)
+- **Routing**: React Router v6
+- **Validation**: React Hook Form + Zod Schema Validation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 📦 Core Features Included
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. **Dashboard & Auth Flow**:
+   - Local authentication (Sign-in / Register with dynamic OTP inputs).
+   - OAuth2 Provisioning flow.
+2. **Interactive Checkout & Simulated Payments**:
+   - Advanced address selection and coupon application.
+   - Secure Razorpay payment sequence (UPI QR code scanner, Net Banking dropdowns, and form validations for credit/debit card details).
+3. **Fulfillment Tracking & Live Activities**:
+   - Real-time order status tracking with timeline bars synced directly with backend SSE feeds.
+   - Autocomplete search suggestions and dynamic category browsing filters.
+
+---
+
+## ⚙️ Environment Variables (`.env`)
+
+Create a `.env` or `.env.local` file in the root of the project:
+
+```properties
+VITE_API_URL=http://localhost:8080
+VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Getting Started
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+
+### 1. Install Dependencies
+```bash
+npm install
 ```
+
+### 2. Start the Development Server
+```bash
+npm run dev
+```
+Open `http://localhost:5173` in your browser.
+
+### 3. Production Build
+```bash
+npm run build
+```
+The optimized bundles will be outputted to the `dist/` directory, ready to be deployed to Vercel, Netlify, or AWS.
