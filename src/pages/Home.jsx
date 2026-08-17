@@ -172,17 +172,32 @@ export const Home = () => {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const [trending, arrivals, deals, best] = await Promise.all([
+        const results = await Promise.allSettled([
           apiClient.get("/api/v1/products/trending"),
           apiClient.get("/api/v1/products/new-arrivals"),
           apiClient.get("/api/v1/products/deals"),
           apiClient.get("/api/v1/products/best-sellers"),
         ]);
 
-        setTrendingProducts((trending || []).map(mapBackendProduct));
-        setNewArrivals((arrivals || []).map(mapBackendProduct));
-        setFlashDeals((deals || []).map(mapBackendProduct));
-        setBestSellers((best || []).map(mapBackendProduct));
+        const trending = results[0].status === "fulfilled" ? results[0].value : [];
+        const arrivals = results[1].status === "fulfilled" ? results[1].value : [];
+        const deals = results[2].status === "fulfilled" ? results[2].value : [];
+        const best = results[3].status === "fulfilled" ? results[3].value : [];
+
+        if (trending && trending.length > 0) {
+          setTrendingProducts(trending.map(mapBackendProduct));
+        }
+        if (arrivals && arrivals.length > 0) {
+          setNewArrivals(arrivals.map(mapBackendProduct));
+        }
+        if (deals && deals.length > 0) {
+          setFlashDeals(deals.map(mapBackendProduct));
+        }
+        if (best && best.length > 0) {
+          setBestSellers(best.map(mapBackendProduct));
+        } else if (trending && trending.length > 0) {
+          setBestSellers(trending.slice().reverse().map(mapBackendProduct));
+        }
       } catch (err) {
         console.error("Failed to load home product sections", err);
       }
@@ -313,30 +328,30 @@ export const Home = () => {
           </div>
 
           {/* Horizontally Scrollable Row */}
-          <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth snap-x snap-mandatory">
             {flashDeals.map((product) => (
               <div
                 key={product.id}
-                className="w-[160px] sm:w-[190px] md:w-[210px] flex-shrink-0"
+                className="w-[145px] sm:w-[175px] md:w-[200px] lg:w-[220px] flex-shrink-0 snap-start"
               >
                 <ProductCard product={product} />
               </div>
             ))}
-            <div className="flex-shrink-0 w-[160px] sm:w-[190px] md:w-[210px] bg-gray-50 hover:bg-gray-100 border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-center p-6 gap-3 group transition-colors duration-200">
-              <span className="p-3 bg-white rounded-full shadow-sm text-swift-orange group-hover:scale-110 transition-transform">
-                <ArrowRight className="w-6 h-6" />
+            <div className="flex-shrink-0 w-[145px] sm:w-[175px] md:w-[200px] lg:w-[220px] bg-gray-50 hover:bg-gray-100 border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-center p-4 sm:p-6 gap-2 sm:gap-3 group transition-colors duration-200 snap-start">
+              <span className="p-2.5 sm:p-3 bg-white rounded-full shadow-sm text-swift-orange group-hover:scale-110 transition-transform">
+                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </span>
               <div>
-                <h4 className="font-bold text-sm text-swift-dark">
+                <h4 className="font-bold text-xs sm:text-sm text-swift-dark">
                   Explore More
                 </h4>
-                <p className="text-xs text-swift-mid mt-0.5">
+                <p className="text-[10px] sm:text-xs text-swift-mid mt-0.5">
                   Find 50+ exciting deals
                 </p>
               </div>
               <Link
                 to="/deals"
-                className="text-xs font-bold text-swift-blue hover:underline"
+                className="text-[11px] sm:text-xs font-bold text-swift-blue hover:underline"
               >
                 View All Deals
               </Link>
@@ -455,11 +470,11 @@ export const Home = () => {
           </Link>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth snap-x snap-mandatory">
           {trendingProducts.map((product) => (
             <div
               key={product.id}
-              className="w-[160px] sm:w-[190px] md:w-[210px] flex-shrink-0"
+              className="w-[145px] sm:w-[175px] md:w-[200px] lg:w-[220px] flex-shrink-0 snap-start"
             >
               <ProductCard product={product} />
             </div>
@@ -487,11 +502,11 @@ export const Home = () => {
           </Link>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth snap-x snap-mandatory">
           {bestSellers.map((product) => (
             <div
               key={product.id}
-              className="w-[160px] sm:w-[190px] md:w-[210px] flex-shrink-0"
+              className="w-[145px] sm:w-[175px] md:w-[200px] lg:w-[220px] flex-shrink-0 snap-start"
             >
               <ProductCard product={product} />
             </div>
@@ -519,11 +534,11 @@ export const Home = () => {
           </Link>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth snap-x snap-mandatory">
           {newArrivals.map((product) => (
             <div
               key={product.id}
-              className="w-[160px] sm:w-[190px] md:w-[210px] flex-shrink-0"
+              className="w-[145px] sm:w-[175px] md:w-[200px] lg:w-[220px] flex-shrink-0 snap-start"
             >
               <ProductCard product={product} />
             </div>
