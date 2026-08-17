@@ -101,7 +101,8 @@ export const useChatbot = () => {
         response = await chatbotService.cancelOrder(orderId);
       } else {
         const intent = mapTextToIntent(text);
-        response = await chatbotService.sendMessage(intent);
+        const isKnownIntent = intent !== text;
+        response = await chatbotService.sendMessage(text, isKnownIntent ? intent : null);
       }
 
       // Artificial timeout for realistic typing effect
@@ -109,19 +110,20 @@ export const useChatbot = () => {
         const botMsg = {
           id: Math.random().toString(36).substring(7),
           sender: "bot",
-          text: response.messageText,
-          type: response.type,
-          order: response.order,
+          text: response?.messageText || "How else can I help you?",
+          type: response?.type || "text",
+          order: response?.order,
+          recommendedProducts: response?.recommendedProducts || [],
           options:
-            response.options && response.options.length > 0
-              ? response.options
+            response?.options && response?.options.length > 0
+              ? response?.options
               : DEFAULT_OPTIONS,
-          actionUrl: response.actionUrl,
+          actionUrl: response?.actionUrl,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, botMsg]);
         setIsTyping(false);
-      }, 800);
+      }, 500);
     } catch (error) {
       setIsTyping(false);
       setTimeout(() => {

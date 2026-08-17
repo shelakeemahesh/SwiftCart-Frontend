@@ -118,6 +118,67 @@ export const ChatMessage = ({ message }) => {
           </div>
         )}
 
+        {/* RAG Product Recommendation Cards */}
+        {isBot && message.recommendedProducts && message.recommendedProducts.length > 0 && (
+          <div className="w-full mt-2 flex flex-col gap-2">
+            {message.recommendedProducts.map((prod) => (
+              <div
+                key={prod.id || prod.slug}
+                onClick={() => navigate(`/product/${prod.slug || prod.id}`)}
+                className="group cursor-pointer bg-white rounded-xl border border-gray-200 hover:border-swift-blue/50 hover:shadow-md p-2.5 flex items-start gap-2.5 transition-all duration-200"
+              >
+                {prod.imageUrl ? (
+                  <img
+                    src={prod.imageUrl}
+                    alt={prod.name}
+                    className="w-14 h-14 object-cover rounded-lg flex-shrink-0 border border-gray-100 group-hover:scale-105 transition-transform duration-200"
+                  />
+                ) : (
+                  <div className="w-14 h-14 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 flex-shrink-0">
+                    <Box size={18} />
+                  </div>
+                )}
+
+                <div className="flex-grow min-w-0">
+                  <p className="text-xs font-semibold text-swift-dark truncate group-hover:text-swift-blue transition-colors">
+                    {prod.name}
+                  </p>
+                  {prod.brand && (
+                    <p className="text-[10px] text-swift-mid">{prod.brand}</p>
+                  )}
+                  
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-xs font-bold text-swift-dark">
+                      ₹{prod.price?.toLocaleString()}
+                    </span>
+                    {prod.mrp && prod.mrp > prod.price && (
+                      <span className="text-[10px] text-gray-400 line-through">
+                        ₹{prod.mrp?.toLocaleString()}
+                      </span>
+                    )}
+                    {prod.averageRating > 0 && (
+                      <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.2 rounded flex items-center gap-0.5">
+                        ⭐ {prod.averageRating}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-gray-100">
+                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
+                      prod.inStock ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
+                    }`}>
+                      {prod.inStock ? "In Stock" : "Out of Stock"}
+                    </span>
+                    <span className="text-[10px] text-swift-blue font-semibold flex items-center gap-0.5 group-hover:underline">
+                      View Item <ArrowRight size={10} />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Action Button Redirects */}
         {isBot && message.actionUrl && (
           <Link
