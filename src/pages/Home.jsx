@@ -172,17 +172,17 @@ export const Home = () => {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const [trending, arrivals, deals] = await Promise.all([
+        const [trending, arrivals, deals, best] = await Promise.all([
           apiClient.get("/api/v1/products/trending"),
           apiClient.get("/api/v1/products/new-arrivals"),
           apiClient.get("/api/v1/products/deals"),
+          apiClient.get("/api/v1/products/best-sellers"),
         ]);
 
-        const mappedTrending = (trending || []).map(mapBackendProduct);
-        setTrendingProducts(mappedTrending);
+        setTrendingProducts((trending || []).map(mapBackendProduct));
         setNewArrivals((arrivals || []).map(mapBackendProduct));
         setFlashDeals((deals || []).map(mapBackendProduct));
-        setBestSellers(mappedTrending.slice(0, 4));
+        setBestSellers((best || []).map(mapBackendProduct));
       } catch (err) {
         console.error("Failed to load home product sections", err);
       }
@@ -317,12 +317,12 @@ export const Home = () => {
             {flashDeals.map((product) => (
               <div
                 key={product.id}
-                className="w-[180px] sm:w-[220px] flex-shrink-0"
+                className="w-[160px] sm:w-[190px] md:w-[210px] flex-shrink-0"
               >
                 <ProductCard product={product} />
               </div>
             ))}
-            <div className="flex-shrink-0 w-[180px] sm:w-[220px] bg-gray-50 hover:bg-gray-100 border border-dashed border-gray-200 rounded-card flex flex-col items-center justify-center text-center p-6 gap-3 group transition-colors duration-200">
+            <div className="flex-shrink-0 w-[160px] sm:w-[190px] md:w-[210px] bg-gray-50 hover:bg-gray-100 border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-center p-6 gap-3 group transition-colors duration-200">
               <span className="p-3 bg-white rounded-full shadow-sm text-swift-orange group-hover:scale-110 transition-transform">
                 <ArrowRight className="w-6 h-6" />
               </span>
@@ -459,7 +459,7 @@ export const Home = () => {
           {trendingProducts.map((product) => (
             <div
               key={product.id}
-              className="w-[180px] sm:w-[220px] flex-shrink-0"
+              className="w-[160px] sm:w-[190px] md:w-[210px] flex-shrink-0"
             >
               <ProductCard product={product} />
             </div>
@@ -491,7 +491,7 @@ export const Home = () => {
           {bestSellers.map((product) => (
             <div
               key={product.id}
-              className="w-[180px] sm:w-[220px] flex-shrink-0"
+              className="w-[160px] sm:w-[190px] md:w-[210px] flex-shrink-0"
             >
               <ProductCard product={product} />
             </div>
@@ -523,7 +523,7 @@ export const Home = () => {
           {newArrivals.map((product) => (
             <div
               key={product.id}
-              className="w-[180px] sm:w-[220px] flex-shrink-0"
+              className="w-[160px] sm:w-[190px] md:w-[210px] flex-shrink-0"
             >
               <ProductCard product={product} />
             </div>
