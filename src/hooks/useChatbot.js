@@ -10,37 +10,21 @@ const DEFAULT_OPTIONS = [
   "🗣️ Talk to human",
 ];
 
-const mapTextToIntent = (text) => {
-  const clean = text.toLowerCase().trim();
-  if (
-    clean.includes("track") ||
-    clean.includes("status") ||
-    clean.includes("where")
-  )
-    return "TRACK_ORDER";
-  if (clean.includes("cancel")) return "CANCEL_ORDER";
-  if (clean.includes("return") || clean.includes("refund")) return "RETURN";
-  if (
-    clean.includes("payment") ||
-    clean.includes("fail") ||
-    clean.includes("debit")
-  )
-    return "PAYMENT";
-  if (
-    clean.includes("account") ||
-    clean.includes("profile") ||
-    clean.includes("login")
-  )
-    return "ACCOUNT";
-  if (clean.includes("not received") || clean.includes("delay"))
-    return "ORDER_NOT_RECEIVED";
-  if (
-    clean.includes("human") ||
-    clean.includes("support") ||
-    clean.includes("agent")
-  )
-    return "TALK_TO_HUMAN";
-  return text;
+const BUTTON_INTENT_MAP = {
+  "🚚 Track my order": "TRACK_ORDER",
+  "track my order": "TRACK_ORDER",
+  "❌ Cancel an order": "CANCEL_ORDER",
+  "cancel an order": "CANCEL_ORDER",
+  "↩️ Return / Refund": "RETURN",
+  "return / refund": "RETURN",
+  "💳 Payment issue": "PAYMENT",
+  "payment issue": "PAYMENT",
+  "🔐 Account help": "ACCOUNT",
+  "account help": "ACCOUNT",
+  "📦 Order not received": "ORDER_NOT_RECEIVED",
+  "order not received": "ORDER_NOT_RECEIVED",
+  "🗣️ Talk to human": "TALK_TO_HUMAN",
+  "talk to human": "TALK_TO_HUMAN",
 };
 
 export const useChatbot = () => {
@@ -53,7 +37,7 @@ export const useChatbot = () => {
     const greetingText =
       isLoggedIn && user
         ? `Hi ${user.name}! Welcome to SwiftCart Support. How can I assist you today?`
-        : "Hello! Welcome to SwiftCart Support. Please log in for personalized order support, or ask me any general questions!";
+        : "Hello! Welcome to SwiftCart Support. Please log in for personalized order support, or ask me any questions about our products!";
     setMessages([
       {
         id: "welcome",
@@ -78,16 +62,18 @@ export const useChatbot = () => {
   const resetChat = useCallback(() => {
     setMessages([]);
     setIsTyping(false);
-  }, []);
+    initializeChat();
+  }, [initializeChat]);
 
   const sendMessage = useCallback(async (text) => {
-    if (!text.trim()) return;
+    const trimmed = text ? text.trim() : "";
+    if (!trimmed) return;
 
     // Add user message
     const userMsg = {
       id: Math.random().toString(36).substring(7),
       sender: "user",
-      text,
+      text: trimmed,
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMsg]);
@@ -96,13 +82,12 @@ export const useChatbot = () => {
     try {
       let response;
       // If it's order cancellation selection
-      if (text.startsWith("Cancel ")) {
-        const orderId = text.replace("Cancel ", "").trim();
+      if (trimmed.startsWith("Cancel ")) {
+        const orderId = trimmed.replace("Cancel ", "").trim();
         response = await chatbotService.cancelOrder(orderId);
       } else {
-        const intent = mapTextToIntent(text);
-        const isKnownIntent = intent !== text;
-        response = await chatbotService.sendMessage(text, isKnownIntent ? intent : null);
+        const explicitIntent = BUTTON_INTENT_MAP[trimmed] || null;
+        response = await chatbotService.sendMessage(trimmed, explicitIntent);
       }
 
       // Artificial timeout for realistic typing effect
@@ -123,7 +108,7 @@ export const useChatbot = () => {
         };
         setMessages((prev) => [...prev, botMsg]);
         setIsTyping(false);
-      }, 500);
+      }, 400);
     } catch (error) {
       setIsTyping(false);
       setTimeout(() => {
@@ -137,7 +122,7 @@ export const useChatbot = () => {
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, botMsg]);
-      }, 400);
+      }, 300);
     }
   }, []);
 

@@ -26,10 +26,20 @@ export const ChatWindow = ({
     setInputValue("");
   };
 
+  const DEFAULT_OPTIONS = [
+    "🚚 Track my order",
+    "❌ Cancel an order",
+    "↩️ Return / Refund",
+    "💳 Payment issue",
+    "🗣️ Talk to human",
+  ];
+
   // Extract quick replies from the last bot message
   const lastMessage = messages[messages.length - 1];
   const quickReplyOptions =
-    lastMessage && lastMessage.sender === "bot" ? lastMessage.options : [];
+    lastMessage && lastMessage.sender === "bot" && lastMessage.options && lastMessage.options.length > 0
+      ? lastMessage.options
+      : DEFAULT_OPTIONS;
 
   return (
     <div className="w-[calc(100vw-2rem)] sm:w-[360px] h-[80vh] sm:h-[520px] max-h-[520px] bg-white rounded-2xl shadow-modal border border-gray-100 flex flex-col overflow-hidden z-50">
