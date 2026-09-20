@@ -390,11 +390,11 @@ export const Dashboard = () => {
                             <div className="flex items-center gap-3">
                               {/* Thumbnail list */}
                               <div className="flex gap-2">
-                                {order.items.map((item, idx) => (
+                                {(order.items || []).map((item, idx) => (
                                   <img
                                     key={idx}
-                                    src={item.image || FALLBACK_IMAGE}
-                                    alt={item.name}
+                                    src={item?.image || FALLBACK_IMAGE}
+                                    alt={item?.name || "Item"}
                                     className="w-12 h-12 object-cover rounded-button border border-gray-100"
                                     onError={(e) => {
                                       e.currentTarget.onerror = null;
@@ -405,9 +405,11 @@ export const Dashboard = () => {
                               </div>
                               <div className="text-left">
                                 <div className="text-xs font-bold text-swift-dark">
-                                  {order.items.length === 1
-                                    ? order.items[0].name
-                                    : `${order.items[0].name} and ${order.items.length - 1} other item(s)`}
+                                  {!order.items || order.items.length === 0
+                                    ? "No items"
+                                    : order.items.length === 1
+                                      ? order.items[0]?.name || "Item"
+                                      : `${order.items[0]?.name || "Item"} and ${order.items.length - 1} other item(s)`}
                                 </div>
                                 <div className="flex items-center gap-2 mt-1">
                                   <span

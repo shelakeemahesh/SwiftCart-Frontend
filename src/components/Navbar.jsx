@@ -451,7 +451,7 @@ export const Navbar = () => {
                   >
                     <User className="w-5.5 h-5.5 text-swift-blue md:w-5 md:h-5" />
                     <span className="hidden md:inline text-sm font-semibold truncate max-w-[100px]">
-                      {user?.name.split(" ")[0]}
+                      {user?.name ? user.name.split(" ")[0] : "Account"}
                     </span>
                     <ChevronDown className="hidden md:inline w-4 h-4 text-swift-mid" />
                   </button>

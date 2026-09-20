@@ -163,8 +163,8 @@ export const Cart = () => {
                   >
                     {/* Image */}
                     <img
-                      src={item.product.images[0] || FALLBACK_IMAGE}
-                      alt={item.product.name}
+                      src={(item.product?.images && item.product.images[0]) || item.product?.imageUrl || FALLBACK_IMAGE}
+                      alt={item.product?.name || "Product"}
                       className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-button border border-gray-100 bg-gray-50 flex-shrink-0"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
@@ -178,32 +178,32 @@ export const Cart = () => {
                         <div className="flex justify-between items-start gap-4">
                           <h4 className="font-heading font-extrabold text-base text-swift-dark hover:text-swift-orange transition-colors">
                             <Link
-                              to={`/product/${item.product.slug || item.product.id}`}
+                              to={`/product/${item.product?.slug || item.product?.id}`}
                             >
-                              {item.product.name}
+                              {item.product?.name || "Product"}
                             </Link>
                           </h4>
                           <span className="font-mono font-extrabold text-base text-swift-dark shrink-0">
                             ₹
                             {(
-                              item.product.price * item.quantity
+                              (item.product?.price || 0) * (item.quantity || 1)
                             ).toLocaleString("en-IN")}
                           </span>
                         </div>
                         <p className="text-xs text-swift-mid mt-0.5">
                           Sold by:{" "}
-                          {mockDb.getSellerById(item.product.sellerId)?.name ||
+                          {mockDb.getSellerById(item.product?.sellerId)?.name ||
                             "SwiftCart"}
                         </p>
 
                         {/* Selected Variants */}
-                        {Object.keys(item.selectedVariant).length > 0 && (
+                        {item.selectedVariant && Object.keys(item.selectedVariant).length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1.5">
                             {Object.entries(item.selectedVariant).map(
                               ([k, v]) => (
                                 <span
                                   key={k}
-                                  className="inline-block bg-swift-bg text-[10px] font-bold text-swift-blue border border-swift-blue/15 px-2 py-0.5 rounded-pill"
+                                  className="text-[10px] bg-gray-100 text-swift-mid px-2 py-0.5 rounded-button uppercase tracking-wider font-bold"
                                 >
                                   {k}: {v}
                                 </span>
@@ -219,12 +219,16 @@ export const Cart = () => {
                           {/* Stepper */}
                           <div className="flex items-center border border-gray-250 rounded-button bg-white">
                             <button
-                              onClick={() =>
-                                updateQuantity(
-                                  item.cartItemId,
-                                  item.quantity - 1,
-                                )
-                              }
+                              onClick={() => {
+                                if (item.quantity <= 1) {
+                                  removeFromCart(item.cartItemId);
+                                } else {
+                                  updateQuantity(
+                                    item.cartItemId,
+                                    item.quantity - 1,
+                                  );
+                                }
+                              }}
                               className="p-1.5 hover:bg-gray-50 text-swift-mid rounded-l-button"
                               aria-label="Decrease quantity"
                             >

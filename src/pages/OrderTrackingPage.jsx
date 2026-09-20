@@ -214,13 +214,25 @@ export const OrderTrackingPage = () => {
                   <div
                     className="w-full bg-swift-orange transition-all duration-500"
                     style={{
-                      height: `${((order.statusTimeline.filter((s) => s.completed).length - 1) / (order.statusTimeline.length - 1)) * 100}%`,
+                      height: `${
+                        order.statusTimeline && order.statusTimeline.length > 1
+                          ? Math.max(
+                              0,
+                              Math.min(
+                                100,
+                                ((order.statusTimeline.filter((s) => s.completed).length - 1) /
+                                  (order.statusTimeline.length - 1)) *
+                                  100,
+                              ),
+                            )
+                          : 0
+                      }%`,
                     }}
                   />
                 </div>
 
                 {/* Stepper Steps */}
-                {order.statusTimeline.map((step, idx) => (
+                {(order.statusTimeline || []).map((step, idx) => (
                   <motion.div
                     key={step.step}
                     variants={itemVariants}
@@ -300,13 +312,13 @@ export const OrderTrackingPage = () => {
               </h3>
 
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
-                {order.items.map((item, idx) => (
+                {(order.items || []).map((item, idx) => (
                   <div key={idx} className="flex gap-3 text-xs">
                     {/* Item Image */}
                     <div className="w-12 h-12 bg-gray-50 border border-gray-100 rounded overflow-hidden flex-shrink-0">
                       <img
-                        src={item.imageUrl || FALLBACK_IMAGE}
-                        alt={item.name}
+                        src={item?.imageUrl || FALLBACK_IMAGE}
+                        alt={item?.name || "Item"}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -315,15 +327,15 @@ export const OrderTrackingPage = () => {
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <h4
                         className="font-bold text-swift-dark truncate"
-                        title={item.name}
+                        title={item?.name}
                       >
-                        {item.name}
+                        {item?.name || "Item"}
                       </h4>
                       <p className="text-swift-mid font-semibold">
-                        Qty: {item.qty}
+                        Qty: {item?.qty || 1}
                       </p>
                       <p className="text-swift-dark font-bold font-mono">
-                        ₹{item.price.toLocaleString("en-IN")}
+                        ₹{(item?.price ?? 0).toLocaleString("en-IN")}
                       </p>
                     </div>
                   </div>

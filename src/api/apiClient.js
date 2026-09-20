@@ -25,15 +25,30 @@ async function request(path, options = {}) {
     headers.set("Content-Type", "application/json");
   }
 
+  const controller = new AbortController();
+  const timeoutMs = options.timeout || 30000;
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
   const fetchOptions = {
     ...options,
     headers,
+    signal: options.signal || controller.signal,
   };
 
-  let response = await fetch(url.toString(), fetchOptions);
+  let response;
+  try {
+    response = await fetch(url.toString(), fetchOptions);
+  } catch (fetchErr) {
+    clearTimeout(timeoutId);
+    if (fetchErr.name === "AbortError") {
+      throw new Error(`Request timed out after ${timeoutMs / 1000}s`, { cause: fetchErr });
+    }
+    throw fetchErr;
+  }
+  clearTimeout(timeoutId);
 
   // If unauthorized, try to refresh token once
-  if (response.status === 418 || response.status === 401) {
+  if (response.status === 401) {
     const refreshToken = localStorage.getItem("sc_refresh_token");
     if (refreshToken) {
       try {
@@ -50,7 +65,10 @@ async function request(path, options = {}) {
           localStorage.setItem("sc_refresh_token", tokenData.refreshToken);
           // Retry the original request with the new token
           headers.set("Authorization", `Bearer ${tokenData.accessToken}`);
-          response = await fetch(url.toString(), fetchOptions);
+          response = await fetch(url.toString(), {
+            ...fetchOptions,
+            headers,
+          });
         } else {
           // Refresh failed, clear session
           clearSession();

@@ -125,8 +125,8 @@ export const CartDrawer = () => {
                     className="flex gap-3 bg-gray-50/50 p-3 rounded-card border border-gray-100 relative group transition-all"
                   >
                     <img
-                      src={item.product.images[0] || FALLBACK_IMAGE}
-                      alt={item.product.name}
+                      src={(item.product?.images && item.product.images[0]) || item.product?.imageUrl || FALLBACK_IMAGE}
+                      alt={item.product?.name || "Product"}
                       className="w-20 h-20 object-cover rounded-button bg-white border border-gray-100 flex-shrink-0"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
@@ -136,15 +136,15 @@ export const CartDrawer = () => {
 
                     <div className="flex-grow min-w-0 pr-6">
                       <h4 className="text-sm font-bold text-swift-dark truncate group-hover:text-swift-orange transition-colors">
-                        {item.product.name}
+                        {item.product?.name || "Product"}
                       </h4>
                       <p className="text-xs text-swift-mid mt-0.5">
                         Sold by:{" "}
-                        {mockDb.getSellerById(item.product.sellerId)?.name ||
+                        {mockDb.getSellerById(item.product?.sellerId)?.name ||
                           "SwiftCart"}
                       </p>
 
-                      {Object.keys(item.selectedVariant).length > 0 && (
+                      {item.selectedVariant && Object.keys(item.selectedVariant).length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
                           {Object.entries(item.selectedVariant).map(
                             ([key, val]) => (
@@ -162,9 +162,13 @@ export const CartDrawer = () => {
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center bg-white border border-gray-200 rounded-button">
                           <button
-                            onClick={() =>
-                              updateQuantity(item.cartItemId, item.quantity - 1)
-                            }
+                            onClick={() => {
+                              if (item.quantity <= 1) {
+                                removeFromCart(item.cartItemId);
+                              } else {
+                                updateQuantity(item.cartItemId, item.quantity - 1);
+                              }
+                            }}
                             className="p-1 hover:bg-gray-50 text-swift-mid rounded-l-button"
                             aria-label="Decrease quantity"
                           >

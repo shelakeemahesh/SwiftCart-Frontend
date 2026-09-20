@@ -378,14 +378,14 @@ export const Checkout = () => {
                 {cart.map((item) => (
                   <div key={item.cartItemId} className="flex gap-3 text-xs">
                     <img
-                      src={item.product.images[0] || FALLBACK_IMAGE}
-                      alt={item.product.name}
+                      src={(item.product?.images && item.product.images[0]) || item.product?.imageUrl || FALLBACK_IMAGE}
+                      alt={item.product?.name || "Product"}
                       className="w-12 h-12 object-cover rounded-button border border-gray-100 bg-white shrink-0"
                     />
 
                     <div className="flex-grow text-left">
                       <h4 className="font-bold text-swift-dark truncate max-w-[180px]">
-                        {item.product.name}
+                        {item.product?.name || "Product"}
                       </h4>
                       <p className="text-[10px] text-swift-mid">
                         Qty: {item.quantity}
@@ -700,8 +700,8 @@ export const Checkout = () => {
                     className="flex gap-4 border-b border-gray-50 pb-4"
                   >
                     <img
-                      src={item.product.images[0] || FALLBACK_IMAGE}
-                      alt={item.product.name}
+                      src={(item.product?.images && item.product.images[0]) || item.product?.imageUrl || FALLBACK_IMAGE}
+                      alt={item.product?.name || "Product"}
                       className="w-16 h-16 object-cover rounded-button border border-gray-100 bg-gray-50 flex-shrink-0"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
@@ -711,13 +711,13 @@ export const Checkout = () => {
 
                     <div className="flex-grow text-left">
                       <h4 className="text-sm font-bold text-swift-dark truncate">
-                        {item.product.name}
+                        {item.product?.name || "Product"}
                       </h4>
                       <p className="text-xs text-swift-mid">
                         Quantity: {item.quantity} | Seller:{" "}
-                        {mockDb.getSellerById(item.product.sellerId)?.name}
+                        {mockDb.getSellerById(item.product?.sellerId)?.name || "SwiftCart"}
                       </p>
-                      {Object.keys(item.selectedVariant).length > 0 && (
+                      {item.selectedVariant && Object.keys(item.selectedVariant).length > 0 && (
                         <div className="flex gap-1 mt-1">
                           {Object.entries(item.selectedVariant).map(
                             ([k, v]) => (

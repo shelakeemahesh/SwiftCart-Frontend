@@ -48,7 +48,7 @@ export const ProductCard = ({ product, viewMode = "grid" }) => {
     addToast(`${product.name} added to Cart`, "success");
   };
 
-  const hasSecondaryImage = product.images.length > 1;
+  const hasSecondaryImage = Array.isArray(product?.images) && product.images.length > 1;
 
   if (viewMode === "list") {
     return (
@@ -59,7 +59,7 @@ export const ProductCard = ({ product, viewMode = "grid" }) => {
         {/* Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
-          className={`absolute top-4 right-4 z-10 p-2 rounded-full border border-gray-100 shadow-sm transition-all bg-white hover:scale-105 ${
+          className={`absolute top-4 right-4 z-10 p-2 rounded-pill bg-white/80 backdrop-blur-xs border border-gray-200/50 shadow-sm hover:bg-white transition-all ${
             isSaved ? "text-swift-red" : "text-swift-mid hover:text-swift-red"
           }`}
           aria-label="Add to Wishlist"
@@ -74,7 +74,7 @@ export const ProductCard = ({ product, viewMode = "grid" }) => {
           onMouseLeave={() => setCurrentImageIdx(0)}
         >
           <img
-            src={product.images[currentImageIdx] || FALLBACK_IMAGE}
+            src={(product.images && product.images[currentImageIdx]) || (product.images && product.images[0]) || product.imageUrl || FALLBACK_IMAGE}
             alt={product.name}
             loading="lazy"
             className="w-full h-full object-cover transition-all duration-500 hover:scale-105"
@@ -123,7 +123,7 @@ export const ProductCard = ({ product, viewMode = "grid" }) => {
 
             {/* Highlights */}
             <ul className="mt-3 space-y-1 hidden md:block">
-              {product.highlights.slice(0, 3).map((hl, i) => (
+              {(product.highlights || []).slice(0, 3).map((hl, i) => (
                 <li
                   key={i}
                   className="text-xs text-swift-mid flex items-center gap-1.5"
@@ -140,12 +140,12 @@ export const ProductCard = ({ product, viewMode = "grid" }) => {
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-extrabold text-swift-dark">
-                  ₹{product.price.toLocaleString("en-IN")}
+                  ₹{(product.price ?? 0).toLocaleString("en-IN")}
                 </span>
-                {product.mrp > product.price && (
+                {(product.mrp || 0) > (product.price || 0) && (
                   <>
                     <span className="text-sm text-swift-mid line-through font-mono">
-                      ₹{product.mrp.toLocaleString("en-IN")}
+                      ₹{(product.mrp ?? 0).toLocaleString("en-IN")}
                     </span>
                     <span className="text-sm font-bold text-swift-orange">
                       ({product.discount}% OFF)
@@ -260,12 +260,12 @@ export const ProductCard = ({ product, viewMode = "grid" }) => {
           <div>
             <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
               <span className="text-sm sm:text-base font-extrabold text-gray-900">
-                ₹{product.price.toLocaleString("en-IN")}
+                ₹{(product.price ?? 0).toLocaleString("en-IN")}
               </span>
-              {product.mrp > product.price && (
+              {(product.mrp || 0) > (product.price || 0) && (
                 <>
                   <span className="text-[10px] sm:text-[11px] text-gray-400 line-through">
-                    ₹{product.mrp.toLocaleString("en-IN")}
+                    ₹{(product.mrp ?? 0).toLocaleString("en-IN")}
                   </span>
                   <span className="text-[9px] sm:text-[10px] font-bold text-green-700 bg-green-50 px-1 py-0.2 rounded">
                     -{product.discount}%

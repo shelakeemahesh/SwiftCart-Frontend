@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuthStore, useToastStore } from "../store/useSwiftStore";
+import { useAuthStore, useCartStore, useWishlistStore, useToastStore } from "../store/useSwiftStore";
 
 export default function OAuth2Callback() {
   const [searchParams] = useSearchParams();
@@ -15,7 +15,6 @@ export default function OAuth2Callback() {
 
     if (error) {
       console.error("OAuth2 login error:", error);
-      addToast(`Authentication failed: ${error}`, "error");
       navigate(`/login?error=${encodeURIComponent(error)}`, { replace: true });
       return;
     }
@@ -30,17 +29,29 @@ export default function OAuth2Callback() {
 
       // Fetch user profile and redirect
       fetchCurrentUser()
-        .then(() => {
+        .then((userData) => {
           addToast("Logged in successfully with social account!", "success");
-          // Fetch addresses
-          useAuthStore
-            .getState()
-            .fetchAddresses()
-            .catch(() => {});
-          navigate("/dashboard", { replace: true });
+          
+          // Hydrate user data, cart, and wishlist
+          useAuthStore.getState().fetchAddresses().catch(() => {});
+          useCartStore.getState().fetchCart().catch(() => {});
+          useWishlistStore.getState().fetchWishlist().catch(() => {});
+
+          const role = userData?.role || localStorage.getItem("sc_user_role");
+          const targetUrl = role === "ADMIN" 
+            ? "/admin" 
+            : role === "SELLER" 
+              ? "/seller/dashboard" 
+              : "/dashboard";
+
+          navigate(targetUrl, { replace: true });
         })
         .catch((err) => {
           console.error("Failed to load user info", err);
+          localStorage.removeItem("sc_logged_in");
+          localStorage.removeItem("sc_access_token");
+          localStorage.removeItem("sc_refresh_token");
+          useAuthStore.setState({ isLoggedIn: false, user: null });
           addToast("Failed to load profile. Please try again.", "error");
           navigate("/login", { replace: true });
         });
