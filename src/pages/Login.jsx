@@ -34,6 +34,14 @@ export const Login = () => {
     }
   }, [isLoggedIn, user, redirect, navigate]);
 
+  // Show error param toast if present
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      addToast(`Authentication failed: ${decodeURIComponent(errorParam)}`, "error");
+    }
+  }, [searchParams, addToast]);
+
   // Resend Timer logic
   useEffect(() => {
     if (!otpSent || timer === 0) return;

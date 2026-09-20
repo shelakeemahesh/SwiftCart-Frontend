@@ -3,7 +3,34 @@ import { apiClient, API_BASE_URL } from "../api/apiClient";
 import { mockDb } from "../data/mockDb";
 
 export function mapBackendProduct(p) {
-  if (!p) return {};
+  if (!p) {
+    return {
+      id: "",
+      name: "",
+      slug: "",
+      description: "",
+      price: 0,
+      mrp: 0,
+      discount: 0,
+      images: [],
+      category: "General",
+      brand: "",
+      rating: 0,
+      reviewCount: 0,
+      inStock: false,
+      stockCount: 0,
+      isTrending: false,
+      isNewArrival: false,
+      isBestSeller: false,
+      isSwiftChoice: false,
+      sellerId: "1",
+      deliveryDays: 3,
+      highlights: [],
+      specs: {},
+      reviews: [],
+      variants: [],
+    };
+  }
   return {
     id: String(p.id || ""),
     name: p.name || "",
@@ -219,11 +246,11 @@ export const useAuthStore = create((set, get) => ({
     typeof window !== "undefined" &&
     localStorage.getItem("sc_logged_in") === "true"
       ? {
-          name: localStorage.getItem("sc_user_name") || "John Doe",
-          phone: localStorage.getItem("sc_user_phone") || "9876543210",
+          name: localStorage.getItem("sc_user_name") || "User",
+          phone: localStorage.getItem("sc_user_phone") || "",
           email:
-            localStorage.getItem("sc_user_email") || "mahesh@swiftcart.com",
-          role: localStorage.getItem("sc_user_role") || "ADMIN",
+            localStorage.getItem("sc_user_email") || "user@swiftcart.com",
+          role: localStorage.getItem("sc_user_role") || "CUSTOMER",
           provider: localStorage.getItem("sc_user_provider") || "LOCAL",
           avatarUrl: localStorage.getItem("sc_user_avatar_url") || "",
         }
@@ -233,7 +260,7 @@ export const useAuthStore = create((set, get) => ({
     localStorage.getItem("sc_logged_in") === "true",
   addresses: [],
 
-  login: (phone, name = "Mahesh Kumar", role = "ADMIN") => {
+  login: (phone, name = "User", role = "CUSTOMER") => {
     localStorage.setItem("sc_logged_in", "true");
     localStorage.setItem("sc_user_name", name);
     localStorage.setItem("sc_user_phone", phone);
@@ -244,7 +271,7 @@ export const useAuthStore = create((set, get) => ({
       user: {
         name,
         phone,
-        email: "mahesh@swiftcart.com",
+        email: "user@swiftcart.com",
         role,
         provider: "LOCAL",
         avatarUrl: "",
@@ -384,24 +411,28 @@ export const useAuthStore = create((set, get) => ({
   fetchCurrentUser: async () => {
     try {
       const data = await apiClient.get("/api/v1/auth/me");
-      localStorage.setItem("sc_user_name", data.name || "");
-      localStorage.setItem("sc_user_phone", data.phone || "");
-      localStorage.setItem("sc_user_email", data.email || "");
-      localStorage.setItem("sc_user_role", data.role || "CUSTOMER");
-      localStorage.setItem("sc_user_provider", data.provider || "LOCAL");
-      localStorage.setItem("sc_user_avatar_url", data.avatarUrl || "");
-      set({
-        user: {
-          name: data.name || "",
-          phone: data.phone || "",
-          email: data.email || "",
-          role: data.role || "CUSTOMER",
-          provider: data.provider || "LOCAL",
-          avatarUrl: data.avatarUrl || "",
-        },
-      });
+      if (data) {
+        localStorage.setItem("sc_user_name", data.name || "");
+        localStorage.setItem("sc_user_phone", data.phone || "");
+        localStorage.setItem("sc_user_email", data.email || "");
+        localStorage.setItem("sc_user_role", data.role || "CUSTOMER");
+        localStorage.setItem("sc_user_provider", data.provider || "LOCAL");
+        localStorage.setItem("sc_user_avatar_url", data.avatarUrl || "");
+        set({
+          user: {
+            name: data.name || "",
+            phone: data.phone || "",
+            email: data.email || "",
+            role: data.role || "CUSTOMER",
+            provider: data.provider || "LOCAL",
+            avatarUrl: data.avatarUrl || "",
+          },
+        });
+        return data;
+      }
     } catch (e) {
       console.error("Failed to fetch current user profile", e);
+      throw e;
     }
   },
 }));
@@ -537,6 +568,9 @@ export const useCartStore = create((set, get) => ({
   },
 
   updateQuantity: async (cartItemId, quantity) => {
+    if (quantity <= 0) {
+      return get().removeFromCart(cartItemId);
+    }
     const isLoggedIn = useAuthStore.getState().isLoggedIn;
     if (isLoggedIn) {
       try {

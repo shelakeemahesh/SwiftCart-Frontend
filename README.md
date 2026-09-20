@@ -1,73 +1,113 @@
 # SwiftCart Frontend ⚡
 
-SwiftCart is a premium, full-featured e-commerce application. This repository contains the high-fidelity, responsive frontend React application designed with rich aesthetics, smooth animations, and optimized state management.
+[![SwiftCart Frontend CI](https://github.com/shelakeemahesh/SwiftCart-Frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/shelakeemahesh/SwiftCart-Frontend/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node: 20+](https://img.shields.io/badge/node-20%2B-brightgreen)](https://nodejs.org)
+[![Vite](https://img.shields.io/badge/bundler-Vite-646CFF.svg)](https://vitejs.dev)
+
+SwiftCart Frontend is the modern, high-performance customer-facing and seller web portal for SwiftCart. Built with React 19, Vite, Tailwind CSS, Zustand, and TanStack React Query, it delivers a lightning-fast shopping and order management experience.
 
 ---
 
-## 🎨 Design System & Visual Excellence
+## 🎨 Design System & Highlights
 
-- **Brand Colors**: SwiftCart Brand Orange (`#EF9F27`), Accent Deep Blue (`#185FA5`), and Sleek Neutral Grays.
-- **Responsiveness**: Fully optimized for mobile screens (320px+), tablets (768px+), and desktops (1024px+).
-- **Typography & Icons**: Curated fonts (using Outfit/Inter styles) and Lucide React icons.
-- **Animations**: Subtle micro-interactions and transitions driven by Framer Motion.
+- **Visual Identity**: SwiftCart Brand Orange (`#EF9F27`), Deep Ocean Blue (`#185FA5`), and Sleek Neutral Grays.
+- **Responsive**: Mobile-first design optimized for mobile (320px+), tablet (768px+), and desktop (1024px+).
+- **Smooth Animations**: Interactive micro-interactions and transitions driven by Framer Motion.
+- **Resilience**: Robust route-level error boundaries, safe API fallbacks, timeout handling, and image fallbacks.
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Framework**: React 18 & TypeScript (via Vite for lightning-fast HMR)
-- **Styling**: Tailwind CSS 3.x
-- **State Management**: Zustand (lightweight, decoupled stores for cart operations, address books, and authentication states)
-- **Server Cache**: React Query (for efficient query invalidations and data syncing)
-- **Routing**: React Router v6
-- **Validation**: React Hook Form + Zod Schema Validation
+| Layer | Technology |
+|---|---|
+| **Framework & Runtime** | React 19, JavaScript/JSX, Vite |
+| **Styling & Icons** | Tailwind CSS 3.x, Lucide React |
+| **State Management** | Zustand (auth, cart, wishlist, address, toast) |
+| **Server State & Cache** | TanStack React Query v5 |
+| **Routing & RBAC** | React Router v7 with protected route guards |
+| **HTTP Client** | Fetch API with timeout, AbortController, and 401 token refresh |
 
 ---
 
-## 📦 Core Features Included
+## 📦 Key Features
 
-1. **Dashboard & Auth Flow**:
-   - Local authentication (Sign-in / Register with dynamic OTP inputs).
-   - OAuth2 Provisioning flow.
-2. **Interactive Checkout & Simulated Payments**:
-   - Advanced address selection and coupon application.
-   - Secure Razorpay payment sequence (UPI QR code scanner, Net Banking dropdowns, and form validations for credit/debit card details).
-3. **Fulfillment Tracking & Live Activities**:
-   - Real-time order status tracking with timeline bars synced directly with backend SSE feeds.
-   - Autocomplete search suggestions and dynamic category browsing filters.
+1. **Authentication & RBAC**:
+   - Phone + OTP and Email/Password login.
+   - Social OAuth2 login (Google, GitHub) with callback token handling and role redirection.
+   - Protected routes with fine-grained RBAC (`CUSTOMER`, `SELLER`, `ADMIN`).
+2. **Catalog & Search**:
+   - Dynamic product listings with price, category, brand, and rating filters.
+   - Multi-image product gallery, highlights, and customer reviews.
+3. **Cart & Interactive Checkout**:
+   - Persistent cart synced with backend API.
+   - Address management and delivery selection.
+   - Razorpay payment gateway integration with signature verification.
+4. **Order Tracking & AI Chatbot**:
+   - Dynamic status timeline with visual progress stepper.
+   - Integrated AI support chatbot for product recommendations and order inquiry.
+5. **Seller & Admin Portals**:
+   - Seller product management and order fulfillment dashboard.
+   - Admin platform oversight and metric tracking.
 
 ---
 
-## ⚙️ Environment Variables (`.env`)
+## ⚙️ Environment Variables
 
-Create a `.env` or `.env.local` file in the root of the project:
+Create `.env.local` for local development:
 
 ```properties
-VITE_API_URL=http://localhost:8080
-VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
+VITE_RAZORPAY_KEY_ID=rzp_test_YourKeyHere
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+For production deployment:
+
+```properties
+VITE_RAZORPAY_KEY_ID=rzp_live_YourKeyHere
+VITE_API_BASE_URL=https://swiftcart-backend-j3os.onrender.com
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- npm or yarn
+- Node.js 20+
+- npm 10+
 
-### 1. Install Dependencies
+### Installation & Run
 ```bash
-npm install
-```
+# 1. Install dependencies
+npm ci
 
-### 2. Start the Development Server
-```bash
+# 2. Start development server
 npm run dev
-```
-Open `http://localhost:5173` in your browser.
 
-### 3. Production Build
-```bash
+# 3. Lint source files
+npm run lint
+
+# 4. Build production bundle
 npm run build
 ```
-The optimized bundles will be outputted to the `dist/` directory, ready to be deployed to Vercel, Netlify, or AWS.
+
+---
+
+## 🐳 Docker Container
+
+Build and run the hardened production container with Nginx:
+
+```bash
+# Build image
+docker build -t swiftcart-frontend .
+
+# Run container on port 80
+docker run -d -p 80:80 swiftcart-frontend
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).

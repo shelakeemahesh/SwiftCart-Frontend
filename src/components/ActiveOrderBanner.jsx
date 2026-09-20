@@ -20,13 +20,13 @@ export const ActiveOrderBanner = ({ activeOrder }) => {
     }
   };
 
-  const formattedDate = new Date(
-    activeOrder.estimatedDelivery,
-  ).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    weekday: "short",
-  });
+  const formattedDate = activeOrder?.estimatedDelivery
+    ? new Date(activeOrder.estimatedDelivery).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        weekday: "short",
+      })
+    : "Soon";
 
   return (
     <div
@@ -63,9 +63,9 @@ export const ActiveOrderBanner = ({ activeOrder }) => {
             </span>
 
             <span
-              className={`text-[10px] md:text-xs font-bold uppercase px-2.5 py-0.5 rounded-full border ${getStatusColor(activeOrder.status)}`}
+              className={`text-[10px] md:text-xs font-bold uppercase px-2.5 py-0.5 rounded-full border ${getStatusColor(activeOrder?.status)}`}
             >
-              {activeOrder.status.replace(/_/g, " ")}
+              {(activeOrder?.status || "PENDING").replace(/_/g, " ")}
             </span>
           </div>
 
