@@ -32,5 +32,6 @@ jobs:
       - name: Lint source code
         run: npm run lint
 
+      # Verify Vite production bundle compiles cleanly
       - name: Build production bundle
         run: npm run build
