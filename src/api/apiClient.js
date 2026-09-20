@@ -41,7 +41,7 @@ async function request(path, options = {}) {
   } catch (fetchErr) {
     clearTimeout(timeoutId);
     if (fetchErr.name === "AbortError") {
-      throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+      throw new Error(`Request timed out after ${timeoutMs / 1000}s`, { cause: fetchErr });
     }
     throw fetchErr;
   }
